@@ -158,8 +158,8 @@ export function PorscheGT3RS() {
         standard.emissive.set("#eef7ff");
         standard.emissiveIntensity = headlights
           ? materialName.includes("headlight_high")
-            ? 0.26
-            : 0.08
+            ? 0.12
+            : 0.03
           : 0;
       }
 
@@ -178,43 +178,20 @@ export function PorscheGT3RS() {
         standard.toneMapped = true;
       }
 
-      const isNativeRearSignal =
-        (objectName.includes("signal") ||
-          materialName.includes("signal") ||
-          materialName.includes("indicator") ||
-          objectName.includes("indicator")) &&
-        (objectName.includes("rear") ||
-          objectName.includes("tail") ||
-          materialName.includes("rear") ||
-          materialName.includes("tail"));
-
       const isTailLight =
         objectName.includes("taillight") ||
         objectName.includes("brakelight") ||
         materialName.includes("taillight") ||
         materialName.includes("brakelight");
 
-      if (isNativeRearSignal) {
-        standard.color.set(hazards && hazardOn ? "#ff7d00" : "#3a1c0a");
-        standard.emissive.set("#ff6500");
-        standard.emissiveIntensity = hazards && hazardOn ? 1.8 : 0;
-        standard.roughness = 0.2;
-        standard.metalness = 0;
-      } else if (isTailLight) {
-        if (hazards && hazardOn) {
-          standard.color.set("#ff7d00");
-          standard.emissive.set("#ff6500");
-          standard.emissiveIntensity = 1.4;
-        } else {
-          standard.color.set(taillights ? "#8f0010" : "#250005");
-          standard.emissive.set("#ff1028");
-          standard.emissiveIntensity = taillights
-            ? objectName.includes("brakelight") || materialName.includes("brakelight")
-              ? 1.15
-              : 0.9
-            : 0.03;
-        }
-
+      if (isTailLight) {
+        standard.color.set(taillights ? "#8f0010" : "#250005");
+        standard.emissive.set("#ff1028");
+        standard.emissiveIntensity = taillights
+          ? objectName.includes("brakelight") || materialName.includes("brakelight")
+            ? 1.1
+            : 0.86
+          : 0.03;
         standard.roughness = 0.18;
         standard.metalness = 0;
         standard.envMapIntensity = 0.52;

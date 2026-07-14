@@ -54,19 +54,6 @@ export function SummaryOverlay() {
     context.font = `${14 * scale}px Arial`;
     context.fillText(`${paint.name[language]} · 518 HP · 0–60 3.0 s`, 52 * scale, output.height - 42 * scale);
 
-    context.textAlign = "right";
-    context.fillStyle = "rgba(17,21,26,0.92)";
-    context.font = `700 ${17 * scale}px Arial`;
-    context.fillText("PORSCHE", output.width - 46 * scale, output.height - 70 * scale);
-
-    context.fillStyle = "rgba(17,21,26,0.42)";
-    context.font = `${9 * scale}px Arial`;
-    context.fillText(
-      "Unofficial personal project · Not affiliated with Porsche AG",
-      output.width - 46 * scale,
-      output.height - 42 * scale,
-    );
-
     const anchor = document.createElement("a");
     anchor.href = output.toDataURL("image/png");
     anchor.download = `choose-your-porsche-${paintId}-by-marcos.png`;

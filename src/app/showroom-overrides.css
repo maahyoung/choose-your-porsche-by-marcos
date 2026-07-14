@@ -1,4 +1,4 @@
-/* White Showroom Reset — GT3 RS Experience v2 */
+/* White Showroom Reset — GT3 RS Experience v4 */
 
 :root {
   --background: #eef1f4;
@@ -6,8 +6,6 @@
   --muted: rgba(18, 22, 27, 0.56);
   --line: rgba(18, 22, 27, 0.12);
   --panel: rgba(255, 255, 255, 0.82);
-  --porsche-gold: #b8964c;
-  --red-soft: rgba(229, 0, 39, 0.14);
 }
 
 html,
@@ -19,12 +17,13 @@ body {
 .experience-shell {
   isolation: isolate;
   background:
-    radial-gradient(circle at 50% 12%, #ffffff 0%, #fbfcfd 22%, #f1f3f6 56%, #e5e9ee 100%);
+    radial-gradient(circle at 50% 10%, #ffffff 0%, #fafbfd 18%, #edf2f5 54%, #dbe3ea 100%);
 }
 
 .experience-shell::before,
 .vignette,
-.speed-overlay {
+.speed-overlay,
+.top-signature {
   display: none;
 }
 
@@ -34,8 +33,8 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse at 44% 30%, rgba(255, 255, 255, 0.99) 0%, rgba(248, 250, 252, 0.98) 34%, rgba(233, 237, 241, 0.92) 76%, rgba(219, 224, 230, 0.94) 100%),
-    linear-gradient(180deg, #ffffff 0%, #f6f8fa 46%, #e5e9ee 100%);
+    radial-gradient(ellipse at 47% 28%, rgba(255, 255, 255, 1) 0%, rgba(247, 250, 252, 0.99) 28%, rgba(228, 234, 240, 0.95) 74%, rgba(209, 217, 225, 0.99) 100%),
+    linear-gradient(180deg, #ffffff 0%, #f5f8fa 42%, #dfe6ed 100%);
 }
 
 .showroom-side-falloff {
@@ -44,8 +43,8 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 5% 50%, rgba(207, 213, 220, 0.28), transparent 28%),
-    radial-gradient(circle at 95% 46%, rgba(207, 213, 220, 0.22), transparent 26%);
+    radial-gradient(circle at 4% 54%, rgba(180, 189, 198, 0.4), transparent 30%),
+    radial-gradient(circle at 96% 48%, rgba(180, 189, 198, 0.34), transparent 28%);
 }
 
 .showroom-horizon-band {
@@ -53,31 +52,27 @@ body {
   left: 0;
   right: 0;
   top: 43%;
-  height: 18%;
+  height: 20%;
   z-index: 0;
   pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(214, 220, 226, 0.22) 52%, rgba(204, 210, 216, 0.48) 100%);
-  filter: blur(8px);
+    linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(201, 209, 217, 0.24) 44%, rgba(181, 191, 200, 0.58) 100%);
+  filter: blur(10px);
 }
 
 .showroom-floor-glow {
   position: absolute;
   z-index: 0;
-  left: 35%;
+  left: 32%;
   bottom: 2%;
-  width: min(84vw, 1240px);
-  height: min(26vw, 340px);
+  width: min(88vw, 1280px);
+  height: min(27vw, 350px);
   transform: translateX(-50%);
   border-radius: 999px;
   pointer-events: none;
   background:
-    radial-gradient(ellipse,
-      rgba(255, 255, 255, 0.95) 0%,
-      rgba(244, 246, 248, 0.7) 42%,
-      rgba(208, 213, 219, 0.18) 72%,
-      transparent 100%);
-  filter: blur(24px);
+    radial-gradient(ellipse, rgba(255, 255, 255, 0.96) 0%, rgba(244, 246, 248, 0.72) 42%, rgba(196, 204, 212, 0.27) 74%, transparent 100%);
+  filter: blur(28px);
 }
 
 .scene-layer {
@@ -96,29 +91,28 @@ body {
 
 .top-bar {
   display: grid;
-  grid-template-columns: minmax(300px, 1fr) auto minmax(300px, 1fr);
+  grid-template-columns: minmax(220px, 1fr) auto minmax(260px, 1fr);
   align-items: center;
-  gap: 20px;
+  gap: 22px;
   color: #12161b;
   border-bottom-color: rgba(18, 22, 27, 0.09);
   background:
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.52));
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.56));
   box-shadow: 0 10px 32px rgba(42, 49, 58, 0.04);
+  position: relative;
+  z-index: 35;
 }
 
-.hero-lockup {
-  min-width: 0;
-}
-
-.hero-identity {
+.hero-left-lockup {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .porsche-crest {
   width: 34px;
-  height: 42px;
+  height: 44px;
   flex: 0 0 auto;
 }
 
@@ -131,13 +125,12 @@ body {
 .nine-eleven-lockup {
   position: relative;
   display: inline-flex;
-  align-items: flex-start;
-  gap: 8px;
-  min-height: 32px;
+  align-items: flex-end;
+  min-height: 34px;
 }
 
 .nine-eleven {
-  font-size: 1.56rem;
+  font-size: 1.62rem;
   line-height: 1;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -145,33 +138,30 @@ body {
 }
 
 .by-marcos-script {
-  position: relative;
-  top: 2px;
+  position: absolute;
+  left: 54px;
+  bottom: -2px;
   display: inline-block;
-  transform: rotate(-45deg);
-  transform-origin: left center;
+  transform: rotate(-14deg);
+  transform-origin: left bottom;
   font-family: "Brush Script MT", "Snell Roundhand", "Segoe Script", cursive;
-  font-size: 0.95rem;
-  color: rgba(17, 21, 26, 0.88);
+  font-size: 0.66rem;
+  color: rgba(17, 21, 26, 0.76);
   white-space: nowrap;
 }
 
-.hero-specs {
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(18, 22, 27, 0.5);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.porsche-wordmark {
+.center-wordmark {
   justify-self: center;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.62em;
-  color: #11151a;
+  position: static;
+  transform: none;
+  white-space: nowrap;
+}
+
+.porsche-wordmark-image {
+  display: block;
+  width: 176px;
+  height: auto;
+  opacity: 0.98;
 }
 
 .language-toggle,
@@ -180,10 +170,12 @@ body {
 }
 
 .top-actions {
+  position: static;
   justify-self: end;
   display: flex;
-  gap: 16px;
+  gap: 14px;
   align-items: center;
+  z-index: 36;
 }
 
 .top-actions button:hover {
@@ -198,12 +190,18 @@ body {
 }
 
 .configurator-panel {
+  position: relative;
+  z-index: 30;
   color: #12161b;
   border-color: rgba(18, 22, 27, 0.11);
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.8);
   box-shadow:
     0 24px 80px rgba(35, 42, 51, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.summary-overlay {
+  z-index: 40;
 }
 
 .step-nav {
@@ -282,6 +280,7 @@ body {
 }
 
 .scene-notes {
+  z-index: 9;
   color: rgba(18, 22, 27, 0.8);
 }
 
@@ -294,10 +293,29 @@ body {
   color: rgba(18, 22, 27, 0.76);
 }
 
-.summary-overlay {
-  background:
-    linear-gradient(90deg, rgba(247, 249, 251, 0.96) 0%, rgba(247, 249, 251, 0.78) 24%, rgba(247, 249, 251, 0.14) 52%, transparent 72%),
-    linear-gradient(0deg, rgba(225, 229, 234, 0.24), transparent 38%);
+.bottom-specs {
+  position: absolute;
+  z-index: 9;
+  left: 32%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.56);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 28px rgba(18, 22, 27, 0.06);
+}
+
+.bottom-specs span {
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(18, 22, 27, 0.56);
+  white-space: nowrap;
 }
 
 .summary-title,
@@ -356,36 +374,43 @@ body {
 
 @media (max-width: 1180px) and (orientation: landscape) {
   .top-bar {
-    grid-template-columns: minmax(240px, 1fr) auto minmax(220px, 1fr);
+    grid-template-columns: minmax(190px, 1fr) auto minmax(230px, 1fr);
   }
 
-  .hero-specs {
-    max-width: 280px;
+  .porsche-wordmark-image {
+    width: 156px;
   }
 }
 
 @media (max-width: 980px) and (orientation: landscape) {
   .showroom-floor-glow {
-    left: 32%;
-    width: 76vw;
+    left: 30%;
+    width: 80vw;
   }
 
   .top-bar {
-    grid-template-columns: minmax(220px, 1fr) auto minmax(180px, 1fr);
+    grid-template-columns: minmax(180px, 1fr) auto minmax(170px, 1fr);
+    gap: 12px;
   }
 
-  .hero-specs {
-    display: none;
+  .porsche-wordmark-image {
+    width: 138px;
   }
 
-  .summary-spec-grid {
-    grid-template-columns: 1fr 1fr;
+  .bottom-specs {
+    left: 30%;
+    gap: 10px;
+    padding: 7px 12px;
+  }
+
+  .bottom-specs span {
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
   }
 }
 
 @media (max-width: 760px) and (orientation: landscape) {
   .porsche-crest,
-  .hero-specs,
   .top-actions button:nth-child(2),
   .top-actions button:nth-child(3) {
     display: none;
@@ -397,11 +422,28 @@ body {
   }
 
   .nine-eleven {
-    font-size: 1.1rem;
+    font-size: 1.16rem;
   }
 
   .by-marcos-script {
-    font-size: 0.78rem;
+    left: 40px;
+    bottom: -2px;
+    font-size: 0.58rem;
+  }
+
+  .porsche-wordmark-image {
+    width: 104px;
+  }
+
+  .bottom-specs {
+    gap: 8px;
+    left: 28%;
+    bottom: 18px;
+  }
+
+  .bottom-specs span {
+    font-size: 0.52rem;
+    letter-spacing: 0.08em;
   }
 
   .summary-spec-grid {

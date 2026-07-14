@@ -11,6 +11,11 @@ import { copy } from "@/config/translations";
 import { PAINTS } from "@/config/paints";
 import { useConfigurator } from "@/store/configurator";
 
+const specsCopy = {
+  en: ["4.0L N/A", "518 HP", "0–60 3.0 S", "184 MPH"],
+  pt: ["4.0 aspirado", "518 cv", "0–100 3,2 s", "296 km/h"],
+} as const;
+
 export function ConfiguratorExperience() {
   const entered = useConfigurator((state) => state.entered);
   const language = useConfigurator((state) => state.language);
@@ -87,6 +92,12 @@ export function ConfiguratorExperience() {
                 CC BY 4.0
               </a>
             </small>
+          </div>
+
+          <div className="bottom-specs" aria-label="Vehicle specifications">
+            {specsCopy[language].map((item) => (
+              <span key={item}>{item}</span>
+            ))}
           </div>
 
           <small className="project-disclaimer">

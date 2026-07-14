@@ -12,7 +12,7 @@ import * as THREE from "three";
 import { PorscheGT3RS } from "./PorscheGT3RS";
 import { useConfigurator } from "@/store/configurator";
 
-const SCENE_OFFSET_X = -1.08;
+const SCENE_OFFSET_X = -1.34;
 
 function CameraDirector() {
   const summaryMode = useConfigurator((state) => state.summaryMode);
@@ -24,9 +24,9 @@ function CameraDirector() {
 
     const time = state.clock.elapsedTime * 0.18;
     const desired = new THREE.Vector3(
-      SCENE_OFFSET_X + Math.sin(time) * 5.25,
-      1.72 + Math.sin(time * 1.6) * 0.24,
-      Math.cos(time) * 5.75,
+      SCENE_OFFSET_X + Math.sin(time) * 5.0,
+      1.72 + Math.sin(time * 1.6) * 0.2,
+      Math.cos(time) * 5.55,
     );
 
     camera.position.lerp(desired, 1 - Math.pow(0.002, delta));
@@ -45,48 +45,48 @@ function DisplayPlatform({
   return (
     <group position={[SCENE_OFFSET_X, -0.3, 0]}>
       <mesh position={[0, -0.16, 0]} receiveShadow castShadow>
-        <cylinderGeometry args={[4.72, 4.8, 0.24, 96]} />
+        <cylinderGeometry args={[4.86, 4.94, 0.24, 96]} />
         <meshStandardMaterial
-          color="#d8dde3"
+          color="#d4dae0"
           metalness={0.1}
-          roughness={0.52}
-          envMapIntensity={0.72}
+          roughness={0.54}
+          envMapIntensity={0.74}
         />
       </mesh>
 
       <mesh receiveShadow>
-        <cylinderGeometry args={[4.64, 4.68, 0.115, 96]} />
+        <cylinderGeometry args={[4.78, 4.82, 0.115, 96]} />
         <MeshReflectorMaterial
           resolution={quality === "performance" ? 256 : quality === "ultra" ? 1024 : 512}
           blur={quality === "performance" ? [120, 34] : [280, 68]}
-          mixBlur={0.88}
-          mixStrength={quality === "performance" ? 0.22 : 0.4}
-          roughness={0.24}
+          mixBlur={0.9}
+          mixStrength={quality === "performance" ? 0.28 : 0.46}
+          roughness={0.23}
           depthScale={0.18}
           minDepthThreshold={0.3}
           maxDepthThreshold={1.5}
-          color="#f7f8fa"
+          color="#f8fafb"
           metalness={0.1}
-          mirror={0.28}
+          mirror={0.31}
         />
       </mesh>
 
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.061, 0]}>
-        <ringGeometry args={[4.48, 4.63, 128]} />
+        <ringGeometry args={[4.6, 4.76, 128]} />
         <meshBasicMaterial
-          color="#cfd4da"
+          color="#c8cfd6"
           transparent
-          opacity={0.58}
+          opacity={0.64}
           toneMapped={false}
         />
       </mesh>
 
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.067, 0]}>
-        <ringGeometry args={[4.18, 4.24, 128]} />
+        <ringGeometry args={[4.24, 4.32, 128]} />
         <meshBasicMaterial
           color="#ffffff"
           transparent
-          opacity={0.8}
+          opacity={0.88}
           toneMapped={false}
         />
       </mesh>
@@ -100,36 +100,36 @@ function SceneContent() {
 
   return (
     <>
-      <fog attach="fog" args={["#edf0f3", 9.2, quality === "performance" ? 26 : 36]} />
-      <PerspectiveCamera makeDefault position={[4.9, 2.12, 5.75]} fov={31} />
+      <fog attach="fog" args={["#edf1f4", 8.4, quality === "performance" ? 24 : 35]} />
+      <PerspectiveCamera makeDefault position={[4.8, 2.06, 5.7]} fov={31} />
 
-      <ambientLight intensity={0.86} />
-      <hemisphereLight args={["#ffffff", "#b9c0c8", 1.24]} />
+      <ambientLight intensity={0.9} />
+      <hemisphereLight args={["#ffffff", "#b8bfc7", 1.28]} />
 
       <spotLight
-        position={[5.8, 8.5, 6.2]}
-        intensity={74}
+        position={[6.0, 8.8, 6.5]}
+        intensity={80}
         angle={0.38}
         penumbra={0.92}
         color="#ffffff"
         castShadow
       />
       <spotLight
-        position={[-6.2, 5.4, 3.8]}
-        intensity={48}
-        angle={0.52}
+        position={[-6.6, 5.6, 3.4]}
+        intensity={54}
+        angle={0.54}
         penumbra={0.88}
         color="#f4f8fb"
       />
       <spotLight
-        position={[-4.6, 4.6, -5.6]}
-        intensity={38}
-        angle={0.48}
+        position={[-4.8, 4.9, -5.9]}
+        intensity={45}
+        angle={0.5}
         penumbra={0.86}
         color="#ffffff"
       />
       <pointLight
-        position={[3, 1.3, 2.8]}
+        position={[3.2, 1.4, 2.8]}
         intensity={9}
         distance={9}
         color="#ffffff"
@@ -143,11 +143,11 @@ function SceneContent() {
 
       <ContactShadows
         position={[SCENE_OFFSET_X, 0.25, 0]}
-        opacity={0.34}
-        scale={8.6}
+        opacity={0.38}
+        scale={8.9}
         blur={3.2}
         far={4.8}
-        color="#525860"
+        color="#4f5660"
       />
 
       <CameraDirector />
@@ -156,7 +156,7 @@ function SceneContent() {
         enabled={!summaryMode}
         enablePan={false}
         minDistance={4.4}
-        maxDistance={7.8}
+        maxDistance={7.9}
         minPolarAngle={Math.PI / 3.75}
         maxPolarAngle={Math.PI / 2.08}
         target={[SCENE_OFFSET_X, 0.54, 0]}
