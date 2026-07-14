@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { copy } from "@/config/translations";
 import { getPaint } from "@/config/paints";
 import { useConfigurator } from "@/store/configurator";
-import { Signature } from "./Signature";
 
 const performanceSpecs = [
   ["Engine", "4.0L naturally aspirated flat-six"],
@@ -16,49 +15,9 @@ const performanceSpecs = [
 export function SummaryOverlay() {
   const language = useConfigurator((state) => state.language);
   const summaryMode = useConfigurator((state) => state.summaryMode);
-  const setSummaryMode = useConfigurator((state) => state.setSummaryMode);
-  const replayTransition = useConfigurator((state) => state.replayTransition);
   const paintId = useConfigurator((state) => state.paintId);
   const t = copy[language];
   const paint = getPaint(paintId);
-
-  const saveImage = () => {
-    const source = document.querySelector<HTMLCanvasElement>("canvas");
-    if (!source) return;
-
-    const output = document.createElement("canvas");
-    output.width = source.width;
-    output.height = source.height;
-
-    const context = output.getContext("2d");
-    if (!context) return;
-
-    context.drawImage(source, 0, 0, output.width, output.height);
-
-    const scale = Math.max(1, output.width / 1600);
-    const gradient = context.createLinearGradient(0, output.height * 0.56, 0, output.height);
-    gradient.addColorStop(0, "rgba(255,255,255,0)");
-    gradient.addColorStop(1, "rgba(239,242,246,0.94)");
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, output.width, output.height);
-
-    context.fillStyle = "rgba(17,21,26,0.68)";
-    context.font = `${12 * scale}px Arial`;
-    context.fillText("911 by Marcos", 52 * scale, output.height - 114 * scale);
-
-    context.fillStyle = "#11151a";
-    context.font = `600 ${34 * scale}px Arial`;
-    context.fillText("911 GT3 RS", 52 * scale, output.height - 72 * scale);
-
-    context.fillStyle = "rgba(17,21,26,0.66)";
-    context.font = `${14 * scale}px Arial`;
-    context.fillText(`${paint.name[language]} · 518 HP · 0–60 3.0 s`, 52 * scale, output.height - 42 * scale);
-
-    const anchor = document.createElement("a");
-    anchor.href = output.toDataURL("image/png");
-    anchor.download = `choose-your-porsche-${paintId}-by-marcos.png`;
-    anchor.click();
-  };
 
   return (
     <AnimatePresence>
@@ -73,10 +32,16 @@ export function SummaryOverlay() {
             className="summary-title"
             initial={{ y: 28, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.35, duration: 0.72 }}
+            transition={{ delay: 0.28, duration: 0.72 }}
           >
             <p>{t.configured}</p>
-            <h2>{t.summaryTitle}</h2>
+
+            <h2 className="summary-hero-title">
+              <span className="summary-hero-prefix">
+                {language === "pt" ? "Seu" : "Your"}
+              </span>
+              <span className="summary-hero-model">911 GT3 RS</span>
+            </h2>
 
             <div className="summary-specs">
               <span>992 · 911 GT3 RS</span>
@@ -91,17 +56,11 @@ export function SummaryOverlay() {
                 </div>
               ))}
             </div>
-
-            <Signature />
-            <small className="summary-disclaimer">
-              Unofficial personal project · Not affiliated with Porsche AG
-            </small>
           </motion.div>
 
-          <div className="summary-actions">
-            <button onClick={() => setSummaryMode(false)}>{t.edit}</button>
-            <button onClick={saveImage}>{t.save}</button>
-            <button onClick={replayTransition}>{t.replay}</button>
+          <div className="summary-bottom-brand">
+            <img src="/brand/porsche-wordmark.svg" alt="Porsche" />
+            <small>Unofficial personal project</small>
           </div>
         </motion.section>
       )}

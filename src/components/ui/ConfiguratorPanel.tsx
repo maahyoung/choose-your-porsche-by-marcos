@@ -5,9 +5,30 @@ import { PAINTS, getPaint } from "@/config/paints";
 import { copy } from "@/config/translations";
 import { StepId, useConfigurator } from "@/store/configurator";
 
-const steps: StepId[] = ["paint", "wheels", "exterior", "graphics", "aero", "stance", "lighting", "summary"];
+const steps: StepId[] = [
+  "paint",
+  "wheels",
+  "exterior",
+  "graphics",
+  "aero",
+  "stance",
+  "lighting",
+  "summary",
+];
 
-function Toggle({ label, active, onClick, onLabel, offLabel }: { label: string; active: boolean; onClick: () => void; onLabel: string; offLabel: string }) {
+function Toggle({
+  label,
+  active,
+  onClick,
+  onLabel,
+  offLabel,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+  onLabel: string;
+  offLabel: string;
+}) {
   return (
     <button className="control-row" onClick={onClick} aria-pressed={active}>
       <span>{label}</span>
@@ -16,6 +37,41 @@ function Toggle({ label, active, onClick, onLabel, offLabel }: { label: string; 
         <small>{active ? onLabel : offLabel}</small>
       </span>
     </button>
+  );
+}
+
+function PencilIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m4 20 4.2-1 10.6-10.6a2 2 0 0 0-2.8-2.8L5.4 16.2 4 20Z" />
+      <path d="m14.8 6.8 2.4 2.4" />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3v11m0 0 4-4m-4 4-4-4" />
+      <path d="M5 17v3h14v-3" />
+    </svg>
+  );
+}
+
+function ReplayIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20 11a8 8 0 1 0-2.3 5.7" />
+      <path d="M20 5v6h-6" />
+    </svg>
+  );
+}
+
+function ArrowRightIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 12h14m-5-5 5 5-5 5" />
+    </svg>
   );
 }
 
@@ -31,7 +87,9 @@ export function ConfiguratorPanel() {
   const toggleHeadlights = useConfigurator((state) => state.toggleHeadlights);
   const toggleTaillights = useConfigurator((state) => state.toggleTaillights);
   const toggleHazards = useConfigurator((state) => state.toggleHazards);
+  const summaryMode = useConfigurator((state) => state.summaryMode);
   const setSummaryMode = useConfigurator((state) => state.setSummaryMode);
+  const replayTransition = useConfigurator((state) => state.replayTransition);
   const t = copy[language];
   const selectedPaint = getPaint(paintId);
 
@@ -40,8 +98,56 @@ export function ConfiguratorPanel() {
     setSummaryMode(true);
   };
 
+  const editConfiguration = () => {
+    setSummaryMode(false);
+    setActiveStep("paint");
+  };
+
+  const saveImage = () => {
+    const source = document.querySelector<HTMLCanvasElement>("canvas");
+    if (!source) return;
+
+    const output = document.createElement("canvas");
+    output.width = source.width;
+    output.height = source.height;
+
+    const context = output.getContext("2d");
+    if (!context) return;
+
+    context.drawImage(source, 0, 0, output.width, output.height);
+
+    const scale = Math.max(1, output.width / 1600);
+    const gradient = context.createLinearGradient(
+      0,
+      output.height * 0.56,
+      0,
+      output.height,
+    );
+    gradient.addColorStop(0, "rgba(255,255,255,0)");
+    gradient.addColorStop(1, "rgba(239,242,246,0.94)");
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, output.width, output.height);
+
+    context.fillStyle = "#11151a";
+    context.font = `600 ${34 * scale}px Arial`;
+    context.fillText("911 GT3 RS", 52 * scale, output.height - 72 * scale);
+
+    context.fillStyle = "rgba(17,21,26,0.66)";
+    context.font = `${14 * scale}px Arial`;
+    context.fillText(
+      `${selectedPaint.name[language]} · 518 HP · 0–60 3.0 s`,
+      52 * scale,
+      output.height - 42 * scale,
+    );
+
+    const anchor = document.createElement("a");
+    anchor.href = output.toDataURL("image/png");
+    anchor.download = `choose-your-porsche-${paintId}-by-marcos.png`;
+    anchor.click();
+  };
+
   return (
-    <aside className="configurator-panel">
+    <aside className={`configurator-panel ${summaryMode ? "summary-active" : ""}`}>
       <nav className="step-nav" aria-label="Configurator steps">
         {steps.map((step, index) => (
           <button
@@ -50,6 +156,7 @@ export function ConfiguratorPanel() {
             onClick={() => {
               setActiveStep(step);
               if (step === "summary") setSummaryMode(true);
+              else if (summaryMode) setSummaryMode(false);
             }}
           >
             <span>{String(index + 1).padStart(2, "0")}</span>
@@ -61,13 +168,14 @@ export function ConfiguratorPanel() {
       <div className="step-content">
         <AnimatePresence mode="wait">
           <motion.div
-            key={activeStep}
+            key={`${activeStep}-${summaryMode ? "summary" : "edit"}`}
             initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -12 }}
             transition={{ duration: 0.28 }}
           >
             <p className="step-kicker">{t[activeStep]}</p>
+
             {activeStep === "paint" && (
               <>
                 <h2>{selectedPaint.name[language]}</h2>
@@ -89,30 +197,72 @@ export function ConfiguratorPanel() {
 
             {activeStep === "lighting" && (
               <div className="control-stack">
-                <Toggle label={t.headlights} active={headlights} onClick={toggleHeadlights} onLabel={t.on} offLabel={t.off} />
-                <Toggle label={t.taillights} active={taillights} onClick={toggleTaillights} onLabel={t.on} offLabel={t.off} />
-                <Toggle label={t.hazards} active={hazards} onClick={toggleHazards} onLabel={t.on} offLabel={t.off} />
+                <Toggle
+                  label={t.headlights}
+                  active={headlights}
+                  onClick={toggleHeadlights}
+                  onLabel={t.on}
+                  offLabel={t.off}
+                />
+                <Toggle
+                  label={t.taillights}
+                  active={taillights}
+                  onClick={toggleTaillights}
+                  onLabel={t.on}
+                  offLabel={t.off}
+                />
+                <Toggle
+                  label={t.hazards}
+                  active={hazards}
+                  onClick={toggleHazards}
+                  onLabel={t.on}
+                  offLabel={t.off}
+                />
               </div>
             )}
 
-            {activeStep !== "paint" && activeStep !== "lighting" && activeStep !== "summary" && (
-              <div className="coming-soon">
-                <span>PHASE 02</span>
-                <p>{t.comingSoon}</p>
-              </div>
-            )}
+            {activeStep !== "paint" &&
+              activeStep !== "lighting" &&
+              activeStep !== "summary" && (
+                <div className="coming-soon">
+                  <span>PHASE 02</span>
+                  <p>{t.comingSoon}</p>
+                </div>
+              )}
 
             {activeStep === "summary" && (
               <div className="summary-mini">
                 <h2>{t.summaryTitle}</h2>
                 <p>{selectedPaint.name[language]} · MARCOS911</p>
+
+                {summaryMode && (
+                  <div className="summary-panel-actions" aria-label="Summary actions">
+                    <button onClick={editConfiguration}>
+                      <PencilIcon />
+                      <span>{t.edit}</span>
+                    </button>
+                    <button onClick={saveImage}>
+                      <DownloadIcon />
+                      <span>{t.save}</span>
+                    </button>
+                    <button onClick={replayTransition}>
+                      <ReplayIcon />
+                      <span>{t.replay}</span>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <button className="view-build-button" onClick={openSummary}>{t.viewBuild}</button>
+      {!summaryMode && (
+        <button className="view-build-button" onClick={openSummary}>
+          <span>{t.viewBuild}</span>
+          <ArrowRightIcon />
+        </button>
+      )}
     </aside>
   );
 }

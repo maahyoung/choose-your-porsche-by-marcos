@@ -116,24 +116,55 @@ export function PorscheGT3RS() {
       const materialName = standard.name.toLowerCase();
       const defaults = materialDefaults.current.get(standard);
 
+      const isCarbon =
+        materialName.includes("carbon") || objectName.includes("carbon");
+      const isGlossBlack =
+        isCarbon ||
+        materialName.includes("antichrome") ||
+        materialName.includes("gt3rs_black");
+      const isExteriorDarkPlastic =
+        materialName.includes("plastic_mgl_060606") &&
+        /(gt3rs|bumper|spoiler|sideskirts|wing|hood|fender)/.test(objectName);
+
       if (materialName.includes("carpaint.003")) {
         standard.color.set(paint.color);
-        standard.metalness = paint.metalness;
-        standard.roughness = Math.max(0.14, paint.roughness);
-        standard.envMapIntensity = 1.42;
+        standard.metalness = Math.max(0.2, paint.metalness * 0.88);
+        standard.roughness = Math.min(
+          0.13,
+          Math.max(0.075, paint.roughness * 0.48),
+        );
+        standard.envMapIntensity = 2.25;
+      }
+
+      if (isGlossBlack) {
+        standard.color.set(isCarbon ? "#0c0e12" : "#080a0e");
+        standard.metalness = isCarbon ? 0.38 : 0.56;
+        standard.roughness = isCarbon ? 0.16 : 0.12;
+        standard.envMapIntensity = 2.15;
+      } else if (isExteriorDarkPlastic) {
+        standard.color.set("#0b0d11");
+        standard.metalness = 0.28;
+        standard.roughness = 0.2;
+        standard.envMapIntensity = 1.75;
       }
 
       if (materialName.includes("wheels_chrome")) {
-        standard.color.set("#15181d");
-        standard.metalness = 0.9;
-        standard.roughness = 0.24;
-        standard.envMapIntensity = 1.1;
+        standard.color.set("#11141a");
+        standard.metalness = 0.94;
+        standard.roughness = 0.16;
+        standard.envMapIntensity = 2.0;
+      }
+
+      if (materialName.includes("glass")) {
+        standard.roughness = Math.min(0.08, standard.roughness);
+        standard.envMapIntensity = Math.max(1.35, standard.envMapIntensity);
       }
 
       if (materialName.includes("caliper")) {
-        standard.color.set("#c8101e");
-        standard.metalness = 0.32;
-        standard.roughness = 0.34;
+        standard.color.set("#d20b1c");
+        standard.metalness = 0.38;
+        standard.roughness = 0.24;
+        standard.envMapIntensity = 1.3;
       }
 
       const isHeadlightAssembly =
@@ -151,7 +182,7 @@ export function PorscheGT3RS() {
           standard.color.copy(defaults.color);
           standard.roughness = defaults.roughness;
           standard.metalness = defaults.metalness;
-          standard.envMapIntensity = Math.max(defaults.envMapIntensity, 0.9);
+          standard.envMapIntensity = Math.max(defaults.envMapIntensity, 1.15);
           standard.toneMapped = defaults.toneMapped;
         }
 
@@ -194,7 +225,7 @@ export function PorscheGT3RS() {
           : 0.03;
         standard.roughness = 0.18;
         standard.metalness = 0;
-        standard.envMapIntensity = 0.52;
+        standard.envMapIntensity = 0.72;
         standard.toneMapped = true;
       }
 

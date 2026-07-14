@@ -4,6 +4,8 @@ import { Suspense, useEffect, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   ContactShadows,
+  Environment,
+  Lightformer,
   MeshReflectorMaterial,
   OrbitControls,
   PerspectiveCamera,
@@ -35,6 +37,43 @@ function CameraDirector() {
   });
 
   return null;
+}
+
+function StudioEnvironment({
+  quality,
+}: {
+  quality: "performance" | "balanced" | "ultra";
+}) {
+  return (
+    <Environment
+      resolution={quality === "performance" ? 128 : quality === "ultra" ? 512 : 256}
+    >
+      <Lightformer
+        form="rect"
+        intensity={4.4}
+        color="#ffffff"
+        position={[-3.5, 5.5, 4.5]}
+        rotation={[-0.35, -0.55, 0.15]}
+        scale={[5.5, 1.4, 1]}
+      />
+      <Lightformer
+        form="rect"
+        intensity={3.4}
+        color="#e8f1f8"
+        position={[4.8, 3.2, -3.8]}
+        rotation={[0.2, 0.75, -0.1]}
+        scale={[4.2, 1.2, 1]}
+      />
+      <Lightformer
+        form="rect"
+        intensity={2.5}
+        color="#ffffff"
+        position={[0, 7.5, 0]}
+        rotation={[Math.PI / 2, 0, 0]}
+        scale={[7, 4, 1]}
+      />
+    </Environment>
+  );
 }
 
 function DisplayPlatform({
@@ -103,12 +142,14 @@ function SceneContent() {
       <fog attach="fog" args={["#edf1f4", 8.4, quality === "performance" ? 24 : 35]} />
       <PerspectiveCamera makeDefault position={[4.8, 2.06, 5.7]} fov={31} />
 
-      <ambientLight intensity={0.9} />
-      <hemisphereLight args={["#ffffff", "#b8bfc7", 1.28]} />
+      <StudioEnvironment quality={quality} />
+
+      <ambientLight intensity={0.62} />
+      <hemisphereLight args={["#ffffff", "#aeb6bf", 0.94]} />
 
       <spotLight
         position={[6.0, 8.8, 6.5]}
-        intensity={80}
+        intensity={68}
         angle={0.38}
         penumbra={0.92}
         color="#ffffff"
@@ -116,21 +157,21 @@ function SceneContent() {
       />
       <spotLight
         position={[-6.6, 5.6, 3.4]}
-        intensity={54}
+        intensity={48}
         angle={0.54}
         penumbra={0.88}
-        color="#f4f8fb"
+        color="#edf6ff"
       />
       <spotLight
         position={[-4.8, 4.9, -5.9]}
-        intensity={45}
+        intensity={52}
         angle={0.5}
         penumbra={0.86}
         color="#ffffff"
       />
       <pointLight
         position={[3.2, 1.4, 2.8]}
-        intensity={9}
+        intensity={7}
         distance={9}
         color="#ffffff"
       />
@@ -192,7 +233,7 @@ export function CarScene() {
       onCreated={({ gl }) => {
         gl.setClearColor(0xffffff, 0);
         gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = 0.98;
+        gl.toneMappingExposure = 1.02;
       }}
       className="car-canvas"
     >

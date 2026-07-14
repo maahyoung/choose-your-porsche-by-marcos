@@ -485,3 +485,371 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* PHASE 02B — LIQUID GLASS + MATERIAL REFINEMENT */
+
+.top-actions {
+  gap: 5px;
+}
+
+.top-action-button {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 11px;
+  color: rgba(18, 22, 27, 0.66) !important;
+  background: transparent !important;
+  letter-spacing: 0.04em !important;
+  text-transform: none !important;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.top-action-button:hover {
+  color: #11151a !important;
+  background: rgba(18, 22, 27, 0.055) !important;
+  transform: translateY(-1px);
+}
+
+.top-action-svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.55;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.language-action {
+  min-width: auto;
+  font-size: 0.65rem !important;
+  letter-spacing: 0.16em !important;
+}
+
+.quality-action {
+  padding-inline: 9px 11px;
+}
+
+.quality-action span {
+  font-size: 0.66rem;
+  letter-spacing: 0.02em;
+}
+
+.configurator-panel {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.56), rgba(245, 248, 251, 0.27)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(165%);
+  backdrop-filter: blur(32px) saturate(165%);
+  box-shadow:
+    0 26px 78px rgba(51, 59, 69, 0.13),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    inset 0 -1px 0 rgba(122, 132, 143, 0.08) !important;
+}
+
+.configurator-panel.summary-active {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.48), rgba(245, 248, 251, 0.22)) !important;
+}
+
+.step-nav {
+  border-right-color: rgba(255, 255, 255, 0.58) !important;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.step-nav button.active {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(226, 231, 236, 0.26)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  box-shadow:
+    0 8px 22px rgba(35, 42, 51, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.step-content {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.view-build-button {
+  margin: 10px;
+  width: calc(100% - 20px);
+  height: 52px;
+  padding: 0 17px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: rgba(18, 22, 27, 0.78) !important;
+  background: rgba(255, 255, 255, 0.42) !important;
+  border: 1px solid rgba(255, 255, 255, 0.66) !important;
+  border-radius: 13px;
+  box-shadow:
+    0 10px 26px rgba(35, 42, 51, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.view-build-button svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.45;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.scene-specs {
+  position: absolute;
+  z-index: 9;
+  left: clamp(28px, 3.5vw, 56px);
+  top: 50%;
+  transform: translateY(-48%);
+  width: 106px;
+  display: grid;
+  gap: 13px;
+  pointer-events: none;
+}
+
+.scene-spec-item {
+  display: grid;
+  gap: 12px;
+}
+
+.scene-spec-item span {
+  color: rgba(18, 22, 27, 0.46);
+  font-size: 0.68rem;
+  font-weight: 480;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.scene-spec-item i {
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: rgba(18, 22, 27, 0.18);
+}
+
+.bottom-specs {
+  display: none !important;
+}
+
+.summary-panel-actions {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid rgba(18, 22, 27, 0.09);
+  border-radius: 13px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.24);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.64);
+}
+
+.summary-panel-actions button {
+  min-height: 74px;
+  padding: 11px 5px 9px;
+  border: 0;
+  border-right: 1px solid rgba(18, 22, 27, 0.07);
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: rgba(18, 22, 27, 0.68);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.summary-panel-actions button:last-child {
+  border-right: 0;
+}
+
+.summary-panel-actions button:hover {
+  color: #11151a;
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.summary-panel-actions svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.summary-panel-actions span {
+  max-width: 64px;
+  font-size: 0.5rem;
+  line-height: 1.22;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.summary-overlay {
+  z-index: 25 !important;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(242, 245, 248, 0.82) 0%,
+      rgba(242, 245, 248, 0.58) 26%,
+      rgba(242, 245, 248, 0.08) 56%,
+      transparent 72%
+    ) !important;
+}
+
+.summary-title {
+  left: clamp(40px, 5.5vw, 88px) !important;
+  top: 50% !important;
+  bottom: auto !important;
+  transform: translateY(-45%) !important;
+  width: min(460px, 37vw) !important;
+}
+
+.summary-title > p {
+  color: rgba(18, 22, 27, 0.48) !important;
+}
+
+.summary-hero-title {
+  margin: 10px 0 16px !important;
+  display: grid;
+  gap: 5px;
+  max-width: 470px;
+  line-height: 0.9 !important;
+}
+
+.summary-hero-prefix {
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(2.1rem, 4.2vw, 4.6rem);
+  font-weight: 340;
+  letter-spacing: -0.06em;
+}
+
+.summary-hero-model {
+  font-family: "Porscha911Title", "Porscha911Bold", sans-serif;
+  font-size: clamp(2.2rem, 4.55vw, 5rem);
+  font-weight: 400;
+  letter-spacing: 0.015em;
+  white-space: nowrap;
+}
+
+.summary-specs span:first-child {
+  color: rgba(18, 22, 27, 0.82) !important;
+}
+
+.summary-specs span:last-child {
+  color: rgba(18, 22, 27, 0.5) !important;
+}
+
+.spec-card {
+  background: rgba(255, 255, 255, 0.52) !important;
+  border-color: rgba(255, 255, 255, 0.68) !important;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.summary-bottom-brand {
+  position: absolute;
+  left: clamp(28px, 3.4vw, 54px);
+  bottom: 34px;
+  display: grid;
+  gap: 7px;
+}
+
+.summary-bottom-brand img {
+  display: block;
+  width: 132px;
+  height: auto;
+  filter: brightness(0) saturate(100%);
+  opacity: 0.8;
+}
+
+.summary-bottom-brand small {
+  color: rgba(18, 22, 27, 0.32);
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.summary-actions {
+  display: none !important;
+}
+
+@media (max-width: 980px) and (orientation: landscape) {
+  .quality-action span {
+    display: none;
+  }
+
+  .quality-action {
+    width: 34px;
+    padding: 0;
+  }
+
+  .scene-specs {
+    left: 22px;
+    width: 88px;
+  }
+
+  .scene-spec-item span {
+    font-size: 0.58rem;
+  }
+
+  .summary-title {
+    width: min(360px, 44vw) !important;
+    left: 28px !important;
+  }
+
+  .summary-hero-model {
+    font-size: clamp(1.8rem, 4.3vw, 3.5rem);
+  }
+
+  .summary-panel-actions button {
+    min-height: 66px;
+  }
+}
+
+@media (max-width: 760px) and (orientation: landscape) {
+  .top-action-button {
+    height: 30px;
+    min-width: 30px;
+    padding: 0 6px;
+  }
+
+  .top-action-svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .scene-specs {
+    left: 14px;
+    top: 52%;
+  }
+
+  .scene-spec-item span {
+    font-size: 0.5rem;
+  }
+
+  .summary-panel-actions span {
+    display: none;
+  }
+
+  .summary-panel-actions button {
+    min-height: 48px;
+  }
+
+  .summary-bottom-brand img {
+    width: 98px;
+  }
+}
+/* PHASE 02B END */

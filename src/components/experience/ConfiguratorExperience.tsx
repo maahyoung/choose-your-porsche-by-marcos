@@ -13,12 +13,13 @@ import { useConfigurator } from "@/store/configurator";
 
 const specsCopy = {
   en: ["4.0L N/A", "518 HP", "0–60 3.0 S", "184 MPH"],
-  pt: ["4.0 aspirado", "518 cv", "0–100 3,2 s", "296 km/h"],
+  pt: ["4.0 ASPIRADO", "518 CV", "0–100 3,2 S", "296 KM/H"],
 } as const;
 
 export function ConfiguratorExperience() {
   const entered = useConfigurator((state) => state.entered);
   const language = useConfigurator((state) => state.language);
+  const summaryMode = useConfigurator((state) => state.summaryMode);
   const setPaintId = useConfigurator((state) => state.setPaintId);
   const toggleHeadlights = useConfigurator((state) => state.toggleHeadlights);
   const toggleTaillights = useConfigurator((state) => state.toggleTaillights);
@@ -71,38 +72,45 @@ export function ConfiguratorExperience() {
           <TopBar />
           <ConfiguratorPanel />
 
-          <div className="scene-notes">
-            <span>{t.drag}</span>
-            <small className="model-credit">
-              <a
-                href="https://sketchfab.com/3d-models/porsche-gt3-rs-e738eae819c34d19a31dd066c45e0f3d"
-                target="_blank"
-                rel="noreferrer"
-              >
-                {language === "pt"
-                  ? "Modelo 3D por Black Snow"
-                  : "3D model by Black Snow"}
-              </a>
-              <span aria-hidden="true"> · </span>
-              <a
-                href="https://creativecommons.org/licenses/by/4.0/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                CC BY 4.0
-              </a>
-            </small>
-          </div>
+          {!summaryMode && (
+            <>
+              <aside className="scene-specs" aria-label="Vehicle specifications">
+                {specsCopy[language].map((item, index) => (
+                  <div className="scene-spec-item" key={item}>
+                    <span>{item}</span>
+                    {index < specsCopy[language].length - 1 && <i aria-hidden="true" />}
+                  </div>
+                ))}
+              </aside>
 
-          <div className="bottom-specs" aria-label="Vehicle specifications">
-            {specsCopy[language].map((item) => (
-              <span key={item}>{item}</span>
-            ))}
-          </div>
+              <div className="scene-notes">
+                <span>{t.drag}</span>
+                <small className="model-credit">
+                  <a
+                    href="https://sketchfab.com/3d-models/porsche-gt3-rs-e738eae819c34d19a31dd066c45e0f3d"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {language === "pt"
+                      ? "Modelo 3D por Black Snow"
+                      : "3D model by Black Snow"}
+                  </a>
+                  <span aria-hidden="true"> · </span>
+                  <a
+                    href="https://creativecommons.org/licenses/by/4.0/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    CC BY 4.0
+                  </a>
+                </small>
+              </div>
 
-          <small className="project-disclaimer">
-            Unofficial personal project · Not affiliated with Porsche AG
-          </small>
+              <small className="project-disclaimer">
+                Unofficial personal project · Not affiliated with Porsche AG
+              </small>
+            </>
+          )}
         </>
       )}
 
