@@ -99,6 +99,8 @@ export function ConfiguratorPanel() {
   const toggleHoodOpen = useConfigurator((state) => state.toggleHoodOpen);
   const leftDoorOpen = useConfigurator((state) => state.leftDoorOpen);
   const toggleLeftDoorOpen = useConfigurator((state) => state.toggleLeftDoorOpen);
+  const rightDoorOpen = useConfigurator((state) => state.rightDoorOpen);
+  const toggleRightDoorOpen = useConfigurator((state) => state.toggleRightDoorOpen);
   const headlights = useConfigurator((state) => state.headlights);
   const taillights = useConfigurator((state) => state.taillights);
   const hazards = useConfigurator((state) => state.hazards);
@@ -155,14 +157,14 @@ export function ConfiguratorPanel() {
     context.fillStyle = "rgba(17,21,26,0.66)";
     context.font = `${14 * scale}px Arial`;
     context.fillText(
-      `${selectedPaint.name[language]} · ${selectedWheel.name[language]} · ${selectedCaliper.name[language]} ${t.calipers}${hoodOpen ? ` · ${t.frontHood}` : ""}${leftDoorOpen ? ` · ${t.leftDoor}` : ""} · 518 HP`,
+      `${selectedPaint.name[language]} · ${selectedWheel.name[language]} · ${selectedCaliper.name[language]} ${t.calipers}${hoodOpen ? ` · ${t.frontHood}` : ""}${leftDoorOpen ? ` · ${t.leftDoor}` : ""}${rightDoorOpen ? ` · ${t.rightDoor}` : ""} · 518 HP`,
       52 * scale,
       output.height - 42 * scale,
     );
 
     const anchor = document.createElement("a");
     anchor.href = output.toDataURL("image/png");
-    anchor.download = `choose-your-porsche-${paintId}-${wheelId}-${caliperId}${hoodOpen ? "-hood-open" : ""}${leftDoorOpen ? "-driver-door-open" : ""}-by-marcos.png`;
+    anchor.download = `choose-your-porsche-${paintId}-${wheelId}-${caliperId}${hoodOpen ? "-hood-open" : ""}${leftDoorOpen ? "-driver-door-open" : ""}${rightDoorOpen ? "-passenger-door-open" : ""}-by-marcos.png`;
     anchor.click();
   };
 
@@ -303,6 +305,16 @@ export function ConfiguratorPanel() {
                   onLabel={t.on}
                   offLabel={t.off}
                 />
+
+                <h2>{t.rightDoor}</h2>
+                <p className="option-next-note">{t.rightDoorNote}</p>
+                <Toggle
+                  label={t.rightDoor}
+                  active={rightDoorOpen}
+                  onClick={toggleRightDoorOpen}
+                  onLabel={t.on}
+                  offLabel={t.off}
+                />
               </div>
             )}
 
@@ -347,7 +359,7 @@ export function ConfiguratorPanel() {
               <div className="summary-mini">
                 <h2>{t.summaryTitle}</h2>
                 <p>
-                  {selectedPaint.name[language]} · {selectedWheel.name[language]} · {selectedCaliper.name[language]} {t.calipers}{hoodOpen ? ` · ${t.frontHood}` : ""}{leftDoorOpen ? ` · ${t.leftDoor}` : ""} · MARCOS911
+                  {selectedPaint.name[language]} · {selectedWheel.name[language]} · {selectedCaliper.name[language]} {t.calipers}{hoodOpen ? ` · ${t.frontHood}` : ""}{leftDoorOpen ? ` · ${t.leftDoor}` : ""}{rightDoorOpen ? ` · ${t.rightDoor}` : ""} · MARCOS911
                 </p>
 
                 {summaryMode && (

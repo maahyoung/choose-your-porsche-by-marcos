@@ -12,6 +12,7 @@ import { useConfigurator } from "@/store/configurator";
 const MODEL_URL = "/models/porsche-911-gt3-rs-992.glb";
 const HOOD_NODE_NAME = "TwiXeR_992_gt3rs_carbon_hood";
 const LEFT_DOOR_NODE_NAME = "TwiXeR_992_gt3rs_door_L";
+const RIGHT_DOOR_NODE_NAME = "TwiXeR_992_gt3rs_door_R";
 const LEFT_DOOR_PART_NAMES = [
   "TwiXeR_992_gt3rs_door_L",
   "TwiXeR_992_doorglass_L_tint",
@@ -19,6 +20,14 @@ const LEFT_DOOR_PART_NAMES = [
   "TwiXeR_992_mirror_L",
   "TwiXeR_992_door_L_antichrome_end",
   "TwiXeR_992_door_L_chrome_end",
+];
+const RIGHT_DOOR_PART_NAMES = [
+  "TwiXeR_992_gt3rs_door_R",
+  "TwiXeR_992_doorglass_R_tint",
+  "TwiXeR_992_doorpanel_R_antichrome",
+  "TwiXeR_992_mirror_R",
+  "TwiXeR_992_door_R_antichrome_end",
+  "TwiXeR_992_door_R_chrome_end",
 ];
 
 type MaterialDefaults = {
@@ -88,6 +97,7 @@ export function PorscheGT3RS() {
   const group = useRef<THREE.Group>(null);
   const hoodPivot = useRef<THREE.Group | null>(null);
   const leftDoorPivot = useRef<THREE.Group | null>(null);
+  const rightDoorPivot = useRef<THREE.Group | null>(null);
   const materialDefaults = useRef(
     new WeakMap<THREE.MeshStandardMaterial, MaterialDefaults>(),
   );
@@ -100,6 +110,8 @@ export function PorscheGT3RS() {
   const toggleHoodOpen = useConfigurator((state) => state.toggleHoodOpen);
   const leftDoorOpen = useConfigurator((state) => state.leftDoorOpen);
   const toggleLeftDoorOpen = useConfigurator((state) => state.toggleLeftDoorOpen);
+  const rightDoorOpen = useConfigurator((state) => state.rightDoorOpen);
+  const toggleRightDoorOpen = useConfigurator((state) => state.toggleRightDoorOpen);
   const headlights = useConfigurator((state) => state.headlights);
   const taillights = useConfigurator((state) => state.taillights);
   const hazards = useConfigurator((state) => state.hazards);
@@ -192,7 +204,35 @@ export function PorscheGT3RS() {
       pivot.rotation.y = leftDoorOpen ? -1.08 : 0;
       leftDoorPivot.current = pivot;
     }
-  }, [hoodOpen, leftDoorOpen, model]);
+
+    const rightDoor = model.getObjectByName(RIGHT_DOOR_NODE_NAME);
+    if (rightDoor && rightDoor.parent && !rightDoorPivot.current) {
+      rightDoor.updateWorldMatrix(true, true);
+
+      const bounds = new THREE.Box3().setFromObject(rightDoor);
+      const doorParent = rightDoor.parent;
+      const pivot = new THREE.Group();
+      pivot.name = "right_door_pivot_manual";
+
+      const worldPivot = new THREE.Vector3(
+        bounds.min.x + 0.012,
+        bounds.min.y + (bounds.max.y - bounds.min.y) * 0.5,
+        bounds.max.z - 0.04,
+      );
+
+      const localPivot = doorParent.worldToLocal(worldPivot.clone());
+      pivot.position.copy(localPivot);
+      doorParent.add(pivot);
+
+      RIGHT_DOOR_PART_NAMES.forEach((partName) => {
+        const part = model.getObjectByName(partName);
+        if (part) pivot.attach(part);
+      });
+
+      pivot.rotation.y = rightDoorOpen ? 1.08 : 0;
+      rightDoorPivot.current = pivot;
+    }
+  }, [hoodOpen, leftDoorOpen, rightDoorOpen, model]);
 
   useEffect(() => {
     transitionStart.current = performance.now();
@@ -393,6 +433,16 @@ export function PorscheGT3RS() {
         delta,
       );
     }
+
+    if (rightDoorPivot.current) {
+      const target = rightDoorOpen ? 1.08 : 0;
+      rightDoorPivot.current.rotation.y = THREE.MathUtils.damp(
+        rightDoorPivot.current.rotation.y,
+        target,
+        6.5,
+        delta,
+      );
+    }
   });
 
   const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
@@ -407,6 +457,11 @@ export function PorscheGT3RS() {
       if (LEFT_DOOR_PART_NAMES.includes(current.name)) {
         event.stopPropagation();
         toggleLeftDoorOpen();
+        return;
+      }
+      if (RIGHT_DOOR_PART_NAMES.includes(current.name)) {
+        event.stopPropagation();
+        toggleRightDoorOpen();
         return;
       }
       current = current.parent;
