@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useFrame } from "@react-three/fiber";
+import { ThreeEvent, useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { getPaint } from "@/config/paints";
 import { getCaliperOption } from "@/config/brakes";
 import { getWheelFinishOption } from "@/config/wheels";
-import { getStanceOption } from "@/config/stance";
 import { useConfigurator } from "@/store/configurator";
 
 const MODEL_URL = "/models/porsche-911-gt3-rs-992.glb";
+const HOOD_NODE_NAME = "TwiXeR_992_gt3rs_carbon_hood";
 
 type MaterialDefaults = {
   color: THREE.Color;
@@ -50,8 +50,20 @@ function captureDefaults(material: THREE.MeshStandardMaterial): MaterialDefaults
   };
 }
 
+function objectHasNamedAncestor(object: THREE.Object3D | null, nodeName: string) {
+  let current: THREE.Object3D | null = object;
+
+  while (current) {
+    if (current.name === nodeName) return true;
+    current = current.parent;
+  }
+
+  return false;
+}
+
 export function PorscheGT3RS() {
   const group = useRef<THREE.Group>(null);
+  const hoodPivot = useRef<THREE.Group | null>(null);
   const materialDefaults = useRef(
     new WeakMap<THREE.MeshStandardMaterial, MaterialDefaults>(),
   );
@@ -60,7 +72,8 @@ export function PorscheGT3RS() {
   const paintId = useConfigurator((state) => state.paintId);
   const wheelId = useConfigurator((state) => state.wheelId);
   const caliperId = useConfigurator((state) => state.caliperId);
-  const stanceId = useConfigurator((state) => state.stanceId);
+  const hoodOpen = useConfigurator((state) => state.hoodOpen);
+  const toggleHoodOpen = useConfigurator((state) => state.toggleHoodOpen);
   const headlights = useConfigurator((state) => state.headlights);
   const taillights = useConfigurator((state) => state.taillights);
   const hazards = useConfigurator((state) => state.hazards);
@@ -69,7 +82,6 @@ export function PorscheGT3RS() {
   const paint = useMemo(() => getPaint(paintId), [paintId]);
   const wheel = useMemo(() => getWheelFinishOption(wheelId), [wheelId]);
   const caliper = useMemo(() => getCaliperOption(caliperId), [caliperId]);
-  const stance = useMemo(() => getStanceOption(stanceId), [stanceId]);
   const transitionStart = useRef(0);
   const [hazardOn, setHazardOn] = useState(true);
 
@@ -77,6 +89,8 @@ export function PorscheGT3RS() {
     const clone = scene.clone(true);
 
     clone.traverse((child) => {
+      child.matrixAutoUpdate = true;
+
       if (!(child instanceof THREE.Mesh)) return;
 
       child.castShadow = true;
@@ -99,6 +113,32 @@ export function PorscheGT3RS() {
 
     return clone;
   }, [scene]);
+
+  useEffect(() => {
+    const hood = model.getObjectByName(HOOD_NODE_NAME);
+    if (!hood || !hood.parent || hoodPivot.current) return;
+
+    hood.updateWorldMatrix(true, true);
+
+    const bounds = new THREE.Box3().setFromObject(hood);
+    const hoodParent = hood.parent;
+    const pivot = new THREE.Group();
+    pivot.name = "hood_pivot_manual";
+
+    const worldPivot = new THREE.Vector3(
+      (bounds.min.x + bounds.max.x) / 2,
+      bounds.max.y - 0.03,
+      bounds.min.z + 0.08,
+    );
+
+    const localPivot = hoodParent.worldToLocal(worldPivot.clone());
+    pivot.position.copy(localPivot);
+    hoodParent.add(pivot);
+    pivot.attach(hood);
+
+    pivot.rotation.x = hoodOpen ? -0.88 : 0;
+    hoodPivot.current = pivot;
+  }, [hoodOpen, model]);
 
   useEffect(() => {
     transitionStart.current = performance.now();
@@ -134,18 +174,15 @@ export function PorscheGT3RS() {
       const isExteriorDarkPlastic =
         materialName.includes("plastic_mgl_060606") &&
         /(gt3rs|bumper|spoiler|sideskirts|wing|hood|fender)/.test(objectName);
-      const isBrakeRotor =
-        (objectName.includes("disc") ||
-          objectName.includes("disk") ||
-          objectName.includes("rotor") ||
-          materialName.includes("disc") ||
-          materialName.includes("disk") ||
-          materialName.includes("rotor") ||
-          ((objectName.includes("brake") || materialName.includes("brake")) &&
-            !objectName.includes("light") &&
-            !materialName.includes("light") &&
-            !materialName.includes("caliper") &&
-            !objectName.includes("caliper")));
+      const isBrakeDiscAssembly =
+        objectName.includes("brakedisc") || materialName.includes("brakedisc");
+      const isBrakeRotorSurface =
+        (materialName.includes("amdb11_brake") || materialName.includes("brake.002")) &&
+        !materialName.includes("caliper");
+      const isBrakeRotorHat =
+        isBrakeDiscAssembly && materialName.includes("misc_chrome");
+      const isBrakeRotorHardware =
+        isBrakeDiscAssembly && materialName.includes("misc.002");
 
       if (materialName.includes("carpaint.003")) {
         standard.color.set(paint.color);
@@ -176,11 +213,21 @@ export function PorscheGT3RS() {
         standard.envMapIntensity = wheel.envMapIntensity;
       }
 
-      if (isBrakeRotor) {
-        standard.color.set("#b8bec6");
-        standard.metalness = 0.52;
-        standard.roughness = 0.34;
-        standard.envMapIntensity = 1.35;
+      if (isBrakeRotorSurface) {
+        standard.color.set("#505861");
+        standard.metalness = 0.56;
+        standard.roughness = 0.4;
+        standard.envMapIntensity = 1.08;
+      } else if (isBrakeRotorHat) {
+        standard.color.set("#676f78");
+        standard.metalness = 0.62;
+        standard.roughness = 0.3;
+        standard.envMapIntensity = 1.2;
+      } else if (isBrakeRotorHardware) {
+        standard.color.set("#434a53");
+        standard.metalness = 0.42;
+        standard.roughness = 0.48;
+        standard.envMapIntensity = 0.96;
       }
 
       if (materialName.includes("glass")) {
@@ -261,7 +308,7 @@ export function PorscheGT3RS() {
     });
   }, [caliper, hazardOn, hazards, headlights, model, paint, taillights, wheel]);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (!group.current) return;
 
     const elapsed = performance.now() - transitionStart.current;
@@ -269,14 +316,31 @@ export function PorscheGT3RS() {
 
     group.current.position.x = pulse * 0.4;
     group.current.position.y =
-      -0.14 + stance.rideHeightOffset + Math.sin(state.clock.elapsedTime * 0.72) * 0.006;
+      -0.14 + Math.sin(state.clock.elapsedTime * 0.72) * 0.006;
     group.current.rotation.y =
       -0.08 + state.pointer.x * 0.022 + pulse * 0.06;
+
+    if (hoodPivot.current) {
+      const target = hoodOpen ? -0.88 : 0;
+      hoodPivot.current.rotation.x = THREE.MathUtils.damp(
+        hoodPivot.current.rotation.x,
+        target,
+        6.5,
+        delta,
+      );
+    }
   });
+
+  const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
+    if (objectHasNamedAncestor(event.object, HOOD_NODE_NAME)) {
+      event.stopPropagation();
+      toggleHoodOpen();
+    }
+  };
 
   return (
     <group ref={group} scale={1.1} dispose={null}>
-      <primitive object={model} />
+      <primitive object={model} onPointerDown={handlePointerDown} />
     </group>
   );
 }

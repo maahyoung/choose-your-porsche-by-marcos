@@ -1212,3 +1212,10 @@ body {
   place-items: center;
   color: #11151a;
 }
+
+
+/* PHASE 03A — FRONT HOOD INTERACTION */
+.option-next-note {
+  margin-top: 8px;
+  margin-bottom: 12px;
+}

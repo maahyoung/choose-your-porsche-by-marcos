@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { PAINTS, getPaint } from "@/config/paints";
 import { CALIPER_OPTIONS, getCaliperOption } from "@/config/brakes";
 import { WHEEL_FINISH_OPTIONS, getWheelFinishOption } from "@/config/wheels";
-import { STANCE_OPTIONS, getStanceOption } from "@/config/stance";
 import { copy } from "@/config/translations";
 import { StepId, useConfigurator } from "@/store/configurator";
 
@@ -15,7 +14,6 @@ const steps: StepId[] = [
   "exterior",
   "graphics",
   "aero",
-  "stance",
   "lighting",
   "summary",
 ];
@@ -97,8 +95,8 @@ export function ConfiguratorPanel() {
   const setWheelId = useConfigurator((state) => state.setWheelId);
   const caliperId = useConfigurator((state) => state.caliperId);
   const setCaliperId = useConfigurator((state) => state.setCaliperId);
-  const stanceId = useConfigurator((state) => state.stanceId);
-  const setStanceId = useConfigurator((state) => state.setStanceId);
+  const hoodOpen = useConfigurator((state) => state.hoodOpen);
+  const toggleHoodOpen = useConfigurator((state) => state.toggleHoodOpen);
   const headlights = useConfigurator((state) => state.headlights);
   const taillights = useConfigurator((state) => state.taillights);
   const hazards = useConfigurator((state) => state.hazards);
@@ -112,7 +110,6 @@ export function ConfiguratorPanel() {
   const selectedPaint = getPaint(paintId);
   const selectedWheel = getWheelFinishOption(wheelId);
   const selectedCaliper = getCaliperOption(caliperId);
-  const selectedStance = getStanceOption(stanceId);
 
   const openSummary = () => {
     setActiveStep("summary");
@@ -156,14 +153,14 @@ export function ConfiguratorPanel() {
     context.fillStyle = "rgba(17,21,26,0.66)";
     context.font = `${14 * scale}px Arial`;
     context.fillText(
-      `${selectedPaint.name[language]} · ${selectedWheel.name[language]} · ${selectedCaliper.name[language]} ${t.calipers} · ${selectedStance.name[language]} · 518 HP`,
+      `${selectedPaint.name[language]} · ${selectedWheel.name[language]} · ${selectedCaliper.name[language]} ${t.calipers}${hoodOpen ? ` · ${t.frontHood}` : ""} · 518 HP`,
       52 * scale,
       output.height - 42 * scale,
     );
 
     const anchor = document.createElement("a");
     anchor.href = output.toDataURL("image/png");
-    anchor.download = `choose-your-porsche-${paintId}-${wheelId}-${caliperId}-${stanceId}-by-marcos.png`;
+    anchor.download = `choose-your-porsche-${paintId}-${wheelId}-${caliperId}${hoodOpen ? "-hood-open" : ""}-by-marcos.png`;
     anchor.click();
   };
 
@@ -282,32 +279,19 @@ export function ConfiguratorPanel() {
               </div>
             )}
 
-            {activeStep === "stance" && (
-              <section className="stance-section" aria-labelledby="stance-heading">
-                <h2 id="stance-heading">{t.stanceSetup}</h2>
-                <div className="stance-grid">
-                  {STANCE_OPTIONS.map((option) => {
-                    const active = option.id === stanceId;
-                    return (
-                      <button
-                        key={option.id}
-                        className={`stance-option ${active ? "active" : ""}`}
-                        onClick={() => setStanceId(option.id)}
-                        aria-pressed={active}
-                      >
-                        <span className="stance-option-copy">
-                          <strong>{option.name[language]}</strong>
-                          <small>{option.label[language]}</small>
-                        </span>
-                        <span className="stance-check" aria-hidden="true">
-                          {active && <CheckIcon />}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="option-next-note">{t.stanceNote}</p>
-              </section>
+
+            {activeStep === "exterior" && (
+              <div className="control-stack">
+                <h2>{t.frontHood}</h2>
+                <p className="option-next-note">{t.frontHoodNote}</p>
+                <Toggle
+                  label={t.frontHood}
+                  active={hoodOpen}
+                  onClick={toggleHoodOpen}
+                  onLabel={t.on}
+                  offLabel={t.off}
+                />
+              </div>
             )}
 
             {activeStep === "lighting" && (
@@ -338,7 +322,7 @@ export function ConfiguratorPanel() {
 
             {activeStep !== "paint" &&
               activeStep !== "wheels" &&
-              activeStep !== "stance" &&
+              activeStep !== "exterior" &&
               activeStep !== "lighting" &&
               activeStep !== "summary" && (
                 <div className="coming-soon">
@@ -351,7 +335,7 @@ export function ConfiguratorPanel() {
               <div className="summary-mini">
                 <h2>{t.summaryTitle}</h2>
                 <p>
-                  {selectedPaint.name[language]} · {selectedWheel.name[language]} · {selectedCaliper.name[language]} {t.calipers} · {selectedStance.name[language]} · MARCOS911
+                  {selectedPaint.name[language]} · {selectedWheel.name[language]} · {selectedCaliper.name[language]} {t.calipers}{hoodOpen ? ` · ${t.frontHood}` : ""} · MARCOS911
                 </p>
 
                 {summaryMode && (

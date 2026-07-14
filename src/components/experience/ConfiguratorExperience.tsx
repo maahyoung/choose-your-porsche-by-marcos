@@ -11,7 +11,6 @@ import { copy } from "@/config/translations";
 import { PAINTS } from "@/config/paints";
 import { CALIPER_OPTIONS } from "@/config/brakes";
 import { WHEEL_FINISH_OPTIONS } from "@/config/wheels";
-import { STANCE_OPTIONS } from "@/config/stance";
 import { useConfigurator } from "@/store/configurator";
 
 const specsCopy = {
@@ -26,7 +25,7 @@ export function ConfiguratorExperience() {
   const setPaintId = useConfigurator((state) => state.setPaintId);
   const setWheelId = useConfigurator((state) => state.setWheelId);
   const setCaliperId = useConfigurator((state) => state.setCaliperId);
-  const setStanceId = useConfigurator((state) => state.setStanceId);
+  const setHoodOpen = useConfigurator((state) => state.setHoodOpen);
   const toggleHeadlights = useConfigurator((state) => state.toggleHeadlights);
   const toggleTaillights = useConfigurator((state) => state.toggleTaillights);
   const toggleHazards = useConfigurator((state) => state.toggleHazards);
@@ -50,11 +49,6 @@ export function ConfiguratorExperience() {
       setCaliperId(caliper);
     }
 
-    const stance = params.get("stance");
-    if (stance && STANCE_OPTIONS.some((option) => option.id === stance)) {
-      setStanceId(stance);
-    }
-
     if (
       params.get("lights") === "1" &&
       !useConfigurator.getState().headlights
@@ -75,10 +69,17 @@ export function ConfiguratorExperience() {
     ) {
       toggleHazards();
     }
+
+    const hood = params.get("hood");
+    if (hood === "1") {
+      setHoodOpen(true);
+    } else if (hood === "0") {
+      setHoodOpen(false);
+    }
   }, [
     setCaliperId,
+    setHoodOpen,
     setPaintId,
-    setStanceId,
     setWheelId,
     toggleHazards,
     toggleHeadlights,

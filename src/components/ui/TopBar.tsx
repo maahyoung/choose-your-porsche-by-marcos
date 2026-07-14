@@ -63,7 +63,7 @@ export function TopBar() {
   const paintId = useConfigurator((state) => state.paintId);
   const wheelId = useConfigurator((state) => state.wheelId);
   const caliperId = useConfigurator((state) => state.caliperId);
-  const stanceId = useConfigurator((state) => state.stanceId);
+  const hoodOpen = useConfigurator((state) => state.hoodOpen);
   const setQuality = useConfigurator((state) => state.setQuality);
 
   const [copied, setCopied] = useState(false);
@@ -80,7 +80,7 @@ export function TopBar() {
     buildUrl.searchParams.set("paint", paintId);
     buildUrl.searchParams.set("wheel", wheelId);
     buildUrl.searchParams.set("caliper", caliperId);
-    buildUrl.searchParams.set("stance", stanceId);
+    buildUrl.searchParams.set("hood", hoodOpen ? "1" : "0");
     const url = buildUrl.toString();
 
     try {
