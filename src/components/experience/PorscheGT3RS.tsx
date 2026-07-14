@@ -62,6 +62,20 @@ function objectHasNamedAncestor(object: THREE.Object3D | null, nodeName: string)
   return false;
 }
 
+function findNamedPart(model: THREE.Object3D, exactName: string, fallback: string) {
+  const exact = model.getObjectByName(exactName);
+  if (exact) return exact;
+
+  let match: THREE.Object3D | null = null;
+  model.traverse((object) => {
+    if (!match && object.name.toLowerCase().includes(fallback.toLowerCase())) {
+      match = object;
+    }
+  });
+
+  return match;
+}
+
 export function PorscheGT3RS() {
   const group = useRef<THREE.Group>(null);
   const hoodPivot = useRef<THREE.Group | null>(null);
@@ -119,30 +133,56 @@ export function PorscheGT3RS() {
   }, [scene]);
 
   useEffect(() => {
-    const hood = model.getObjectByName(HOOD_NODE_NAME);
-    if (!hood || !hood.parent || hoodPivot.current) return;
+    const hood = findNamedPart(model, HOOD_NODE_NAME, "carbon_hood");
+    if (hood && hood.parent && !hoodPivot.current) {
+      hood.updateWorldMatrix(true, true);
 
-    hood.updateWorldMatrix(true, true);
+      const bounds = new THREE.Box3().setFromObject(hood);
+      const hoodParent = hood.parent;
+      const pivot = new THREE.Group();
+      pivot.name = "hood_pivot_manual";
 
-    const bounds = new THREE.Box3().setFromObject(hood);
-    const hoodParent = hood.parent;
-    const pivot = new THREE.Group();
-    pivot.name = "hood_pivot_manual";
+      const worldPivot = new THREE.Vector3(
+        (bounds.min.x + bounds.max.x) / 2,
+        bounds.max.y - 0.03,
+        bounds.min.z + 0.08,
+      );
 
-    const worldPivot = new THREE.Vector3(
-      (bounds.min.x + bounds.max.x) / 2,
-      bounds.max.y - 0.03,
-      bounds.min.z + 0.08,
-    );
+      const localPivot = hoodParent.worldToLocal(worldPivot.clone());
+      pivot.position.copy(localPivot);
+      hoodParent.add(pivot);
+      pivot.attach(hood);
 
-    const localPivot = hoodParent.worldToLocal(worldPivot.clone());
-    pivot.position.copy(localPivot);
-    hoodParent.add(pivot);
-    pivot.attach(hood);
+      pivot.rotation.x = hoodOpen ? -0.88 : 0;
+      hoodPivot.current = pivot;
+    }
 
-    pivot.rotation.x = hoodOpen ? -0.88 : 0;
-    hoodPivot.current = pivot;
-  }, [hoodOpen, model]);
+    const leftDoor = findNamedPart(model, LEFT_DOOR_NODE_NAME, "door_l");
+    if (leftDoor && leftDoor.parent && !leftDoorPivot.current) {
+      leftDoor.updateWorldMatrix(true, true);
+
+      const bounds = new THREE.Box3().setFromObject(leftDoor);
+      const doorParent = leftDoor.parent;
+      const pivot = new THREE.Group();
+      pivot.name = "left_door_pivot_manual";
+
+      // The car front is positive Z in this model. Put the hinge on the
+      // front edge and rotate toward the outside of the visible body side.
+      const worldPivot = new THREE.Vector3(
+        (bounds.min.x + bounds.max.x) / 2,
+        bounds.min.y + (bounds.max.y - bounds.min.y) * 0.52,
+        bounds.max.z - 0.045,
+      );
+
+      const localPivot = doorParent.worldToLocal(worldPivot.clone());
+      pivot.position.copy(localPivot);
+      doorParent.add(pivot);
+      pivot.attach(leftDoor);
+
+      pivot.rotation.y = leftDoorOpen ? -1.08 : 0;
+      leftDoorPivot.current = pivot;
+    }
+  }, [hoodOpen, leftDoorOpen, model]);
 
   useEffect(() => {
     transitionStart.current = performance.now();
@@ -335,7 +375,7 @@ export function PorscheGT3RS() {
     }
 
     if (leftDoorPivot.current) {
-      const target = leftDoorOpen ? 1.02 : 0;
+      const target = leftDoorOpen ? -1.08 : 0;
       leftDoorPivot.current.rotation.y = THREE.MathUtils.damp(
         leftDoorPivot.current.rotation.y,
         target,
@@ -349,6 +389,12 @@ export function PorscheGT3RS() {
     if (objectHasNamedAncestor(event.object, HOOD_NODE_NAME)) {
       event.stopPropagation();
       toggleHoodOpen();
+      return;
+    }
+
+    if (objectHasNamedAncestor(event.object, LEFT_DOOR_NODE_NAME)) {
+      event.stopPropagation();
+      toggleLeftDoorOpen();
     }
   };
 
