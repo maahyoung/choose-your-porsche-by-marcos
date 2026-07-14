@@ -5,6 +5,7 @@ import { copy } from "@/config/translations";
 import { getPaint } from "@/config/paints";
 import { getCaliperOption } from "@/config/brakes";
 import { getWheelFinishOption } from "@/config/wheels";
+import { getStanceOption } from "@/config/stance";
 import { useConfigurator } from "@/store/configurator";
 
 const performanceSpecs = [
@@ -20,10 +21,12 @@ export function SummaryOverlay() {
   const paintId = useConfigurator((state) => state.paintId);
   const wheelId = useConfigurator((state) => state.wheelId);
   const caliperId = useConfigurator((state) => state.caliperId);
+  const stanceId = useConfigurator((state) => state.stanceId);
   const t = copy[language];
   const paint = getPaint(paintId);
   const wheel = getWheelFinishOption(wheelId);
   const caliper = getCaliperOption(caliperId);
+  const stance = getStanceOption(stanceId);
 
   return (
     <AnimatePresence>
@@ -51,7 +54,7 @@ export function SummaryOverlay() {
 
             <div className="summary-specs">
               <span>992 · 911 GT3 RS</span>
-              <span>{paint.name[language]} · {wheel.name[language]} · {caliper.name[language]} {t.calipers} · by Marcos</span>
+              <span>{paint.name[language]} · {wheel.name[language]} · {caliper.name[language]} {t.calipers} · {stance.name[language]} · by Marcos</span>
             </div>
 
             <div className="summary-spec-grid">

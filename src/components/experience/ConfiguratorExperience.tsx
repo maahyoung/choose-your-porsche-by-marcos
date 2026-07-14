@@ -11,6 +11,7 @@ import { copy } from "@/config/translations";
 import { PAINTS } from "@/config/paints";
 import { CALIPER_OPTIONS } from "@/config/brakes";
 import { WHEEL_FINISH_OPTIONS } from "@/config/wheels";
+import { STANCE_OPTIONS } from "@/config/stance";
 import { useConfigurator } from "@/store/configurator";
 
 const specsCopy = {
@@ -25,6 +26,7 @@ export function ConfiguratorExperience() {
   const setPaintId = useConfigurator((state) => state.setPaintId);
   const setWheelId = useConfigurator((state) => state.setWheelId);
   const setCaliperId = useConfigurator((state) => state.setCaliperId);
+  const setStanceId = useConfigurator((state) => state.setStanceId);
   const toggleHeadlights = useConfigurator((state) => state.toggleHeadlights);
   const toggleTaillights = useConfigurator((state) => state.toggleTaillights);
   const toggleHazards = useConfigurator((state) => state.toggleHazards);
@@ -46,6 +48,11 @@ export function ConfiguratorExperience() {
     const caliper = params.get("caliper");
     if (caliper && CALIPER_OPTIONS.some((option) => option.id === caliper)) {
       setCaliperId(caliper);
+    }
+
+    const stance = params.get("stance");
+    if (stance && STANCE_OPTIONS.some((option) => option.id === stance)) {
+      setStanceId(stance);
     }
 
     if (
@@ -71,6 +78,7 @@ export function ConfiguratorExperience() {
   }, [
     setCaliperId,
     setPaintId,
+    setStanceId,
     setWheelId,
     toggleHazards,
     toggleHeadlights,

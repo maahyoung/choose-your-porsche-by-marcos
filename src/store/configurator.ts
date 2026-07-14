@@ -21,6 +21,7 @@ type ConfiguratorState = {
   paintId: string;
   wheelId: string;
   caliperId: string;
+  stanceId: string;
   headlights: boolean;
   taillights: boolean;
   hazards: boolean;
@@ -34,6 +35,7 @@ type ConfiguratorState = {
   setPaintId: (paintId: string) => void;
   setWheelId: (wheelId: string) => void;
   setCaliperId: (caliperId: string) => void;
+  setStanceId: (stanceId: string) => void;
   toggleHeadlights: () => void;
   toggleTaillights: () => void;
   toggleHazards: () => void;
@@ -50,6 +52,7 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
   paintId: "white",
   wheelId: "satin-black",
   caliperId: "red",
+  stanceId: "standard",
   headlights: false,
   taillights: true,
   hazards: false,
@@ -65,6 +68,7 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
     set((state) => ({ paintId, transitionNonce: state.transitionNonce + 1 })),
   setWheelId: (wheelId) => set({ wheelId }),
   setCaliperId: (caliperId) => set({ caliperId }),
+  setStanceId: (stanceId) => set({ stanceId }),
   toggleHeadlights: () => set((state) => ({ headlights: !state.headlights })),
   toggleTaillights: () => set((state) => ({ taillights: !state.taillights })),
   toggleHazards: () => set((state) => ({ hazards: !state.hazards })),

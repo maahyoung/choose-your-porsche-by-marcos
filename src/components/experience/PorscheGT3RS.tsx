@@ -7,6 +7,7 @@ import * as THREE from "three";
 import { getPaint } from "@/config/paints";
 import { getCaliperOption } from "@/config/brakes";
 import { getWheelFinishOption } from "@/config/wheels";
+import { getStanceOption } from "@/config/stance";
 import { useConfigurator } from "@/store/configurator";
 
 const MODEL_URL = "/models/porsche-911-gt3-rs-992.glb";
@@ -59,6 +60,7 @@ export function PorscheGT3RS() {
   const paintId = useConfigurator((state) => state.paintId);
   const wheelId = useConfigurator((state) => state.wheelId);
   const caliperId = useConfigurator((state) => state.caliperId);
+  const stanceId = useConfigurator((state) => state.stanceId);
   const headlights = useConfigurator((state) => state.headlights);
   const taillights = useConfigurator((state) => state.taillights);
   const hazards = useConfigurator((state) => state.hazards);
@@ -67,6 +69,7 @@ export function PorscheGT3RS() {
   const paint = useMemo(() => getPaint(paintId), [paintId]);
   const wheel = useMemo(() => getWheelFinishOption(wheelId), [wheelId]);
   const caliper = useMemo(() => getCaliperOption(caliperId), [caliperId]);
+  const stance = useMemo(() => getStanceOption(stanceId), [stanceId]);
   const transitionStart = useRef(0);
   const [hazardOn, setHazardOn] = useState(true);
 
@@ -131,27 +134,39 @@ export function PorscheGT3RS() {
       const isExteriorDarkPlastic =
         materialName.includes("plastic_mgl_060606") &&
         /(gt3rs|bumper|spoiler|sideskirts|wing|hood|fender)/.test(objectName);
+      const isBrakeRotor =
+        (objectName.includes("disc") ||
+          objectName.includes("disk") ||
+          objectName.includes("rotor") ||
+          materialName.includes("disc") ||
+          materialName.includes("disk") ||
+          materialName.includes("rotor") ||
+          ((objectName.includes("brake") || materialName.includes("brake")) &&
+            !objectName.includes("light") &&
+            !materialName.includes("light") &&
+            !materialName.includes("caliper") &&
+            !objectName.includes("caliper")));
 
       if (materialName.includes("carpaint.003")) {
         standard.color.set(paint.color);
-        standard.metalness = Math.max(0.2, paint.metalness * 0.88);
+        standard.metalness = Math.max(0.24, paint.metalness * 0.92);
         standard.roughness = Math.min(
-          0.13,
-          Math.max(0.075, paint.roughness * 0.48),
+          0.11,
+          Math.max(0.06, paint.roughness * 0.42),
         );
-        standard.envMapIntensity = 2.25;
+        standard.envMapIntensity = 2.55;
       }
 
       if (isGlossBlack) {
-        standard.color.set(isCarbon ? "#0c0e12" : "#080a0e");
-        standard.metalness = isCarbon ? 0.38 : 0.56;
-        standard.roughness = isCarbon ? 0.16 : 0.12;
-        standard.envMapIntensity = 2.15;
+        standard.color.set(isCarbon ? "#080b10" : "#06080d");
+        standard.metalness = isCarbon ? 0.44 : 0.62;
+        standard.roughness = isCarbon ? 0.12 : 0.08;
+        standard.envMapIntensity = 2.55;
       } else if (isExteriorDarkPlastic) {
         standard.color.set("#0b0d11");
-        standard.metalness = 0.28;
-        standard.roughness = 0.2;
-        standard.envMapIntensity = 1.75;
+        standard.metalness = 0.34;
+        standard.roughness = 0.16;
+        standard.envMapIntensity = 2.0;
       }
 
       if (materialName.includes("wheels_chrome")) {
@@ -161,9 +176,16 @@ export function PorscheGT3RS() {
         standard.envMapIntensity = wheel.envMapIntensity;
       }
 
+      if (isBrakeRotor) {
+        standard.color.set("#b8bec6");
+        standard.metalness = 0.52;
+        standard.roughness = 0.34;
+        standard.envMapIntensity = 1.35;
+      }
+
       if (materialName.includes("glass")) {
-        standard.roughness = Math.min(0.08, standard.roughness);
-        standard.envMapIntensity = Math.max(1.35, standard.envMapIntensity);
+        standard.roughness = Math.min(0.06, standard.roughness);
+        standard.envMapIntensity = Math.max(1.55, standard.envMapIntensity);
       }
 
       if (materialName.includes("caliper")) {
@@ -247,7 +269,7 @@ export function PorscheGT3RS() {
 
     group.current.position.x = pulse * 0.4;
     group.current.position.y =
-      -0.14 + Math.sin(state.clock.elapsedTime * 0.72) * 0.006;
+      -0.14 + stance.rideHeightOffset + Math.sin(state.clock.elapsedTime * 0.72) * 0.006;
     group.current.rotation.y =
       -0.08 + state.pointer.x * 0.022 + pulse * 0.06;
   });

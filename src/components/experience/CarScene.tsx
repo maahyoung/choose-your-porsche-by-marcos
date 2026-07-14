@@ -39,38 +39,50 @@ function CameraDirector() {
   return null;
 }
 
-function StudioEnvironment({
-  quality,
-}: {
-  quality: "performance" | "balanced" | "ultra";
-}) {
+function StudioEnvironment({ quality }: { quality: "performance" | "balanced" | "ultra" }) {
   return (
-    <Environment
-      resolution={quality === "performance" ? 128 : quality === "ultra" ? 512 : 256}
-    >
+    <Environment frames={quality === "performance" ? 1 : Infinity} resolution={quality === "ultra" ? 512 : 256}>
       <Lightformer
-        form="rect"
-        intensity={4.4}
+        intensity={4.2}
         color="#ffffff"
-        position={[-3.5, 5.5, 4.5]}
-        rotation={[-0.35, -0.55, 0.15]}
-        scale={[5.5, 1.4, 1]}
+        position={[0, 6.2, 5.2]}
+        rotation={[0, 0, 0]}
+        scale={[6.6, 2.2, 1]}
       />
       <Lightformer
-        form="rect"
-        intensity={3.4}
-        color="#e8f1f8"
-        position={[4.8, 3.2, -3.8]}
-        rotation={[0.2, 0.75, -0.1]}
-        scale={[4.2, 1.2, 1]}
+        intensity={3.7}
+        color="#ffffff"
+        position={[0, 4.8, -5.4]}
+        rotation={[0, Math.PI, 0]}
+        scale={[5.6, 2.4, 1]}
       />
       <Lightformer
-        form="rect"
-        intensity={2.5}
+        intensity={3.6}
+        color="#f9fcff"
+        position={[-5.9, 2.7, 0.8]}
+        rotation={[0, Math.PI / 2, 0]}
+        scale={[3.6, 4.8, 1]}
+      />
+      <Lightformer
+        intensity={3.5}
         color="#ffffff"
-        position={[0, 7.5, 0]}
+        position={[5.8, 2.6, 0.2]}
+        rotation={[0, -Math.PI / 2, 0]}
+        scale={[3.8, 4.9, 1]}
+      />
+      <Lightformer
+        intensity={2.9}
+        color="#eef5fb"
+        position={[0, 1.5, 6.8]}
+        rotation={[0, 0, 0]}
+        scale={[2.4, 1.2, 1]}
+      />
+      <Lightformer
+        intensity={2.6}
+        color="#ffffff"
+        position={[0, 7.2, 0]}
         rotation={[Math.PI / 2, 0, 0]}
-        scale={[7, 4, 1]}
+        scale={[7.4, 4.2, 1]}
       />
     </Environment>
   );
@@ -144,36 +156,42 @@ function SceneContent() {
 
       <StudioEnvironment quality={quality} />
 
-      <ambientLight intensity={0.62} />
-      <hemisphereLight args={["#ffffff", "#aeb6bf", 0.94]} />
+      <ambientLight intensity={0.68} />
+      <hemisphereLight args={["#ffffff", "#b2bac3", 1.02]} />
 
       <spotLight
         position={[6.0, 8.8, 6.5]}
-        intensity={68}
+        intensity={76}
         angle={0.38}
         penumbra={0.92}
         color="#ffffff"
         castShadow
       />
       <spotLight
-        position={[-6.6, 5.6, 3.4]}
-        intensity={48}
+        position={[-6.8, 5.8, 3.7]}
+        intensity={58}
         angle={0.54}
         penumbra={0.88}
         color="#edf6ff"
       />
       <spotLight
-        position={[-4.8, 4.9, -5.9]}
-        intensity={52}
-        angle={0.5}
+        position={[-4.8, 5.0, -6.1]}
+        intensity={58}
+        angle={0.52}
         penumbra={0.86}
         color="#ffffff"
       />
       <pointLight
-        position={[3.2, 1.4, 2.8]}
-        intensity={7}
-        distance={9}
+        position={[4.2, 1.8, 3.4]}
+        intensity={9}
+        distance={10}
         color="#ffffff"
+      />
+      <pointLight
+        position={[-4.6, 2.4, 2.6]}
+        intensity={6.5}
+        distance={8}
+        color="#eef7ff"
       />
 
       <DisplayPlatform quality={quality} />
@@ -233,7 +251,7 @@ export function CarScene() {
       onCreated={({ gl }) => {
         gl.setClearColor(0xffffff, 0);
         gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = 1.02;
+        gl.toneMappingExposure = 1.05;
       }}
       className="car-canvas"
     >

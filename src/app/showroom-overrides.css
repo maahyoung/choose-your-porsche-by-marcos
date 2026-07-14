@@ -1159,3 +1159,56 @@ body {
 }
 
 /* PHASE 02D END */
+
+
+/* PHASE 03 — STANCE OPTIONS */
+
+.stance-grid {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.stance-option {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 13px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 8px 18px rgba(35, 42, 51, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.62);
+}
+
+.stance-option.active {
+  border-color: rgba(18, 22, 27, 0.22);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(226, 231, 236, 0.24));
+}
+
+.stance-option-copy {
+  display: grid;
+  gap: 3px;
+  text-align: left;
+}
+
+.stance-option-copy strong {
+  font-size: 0.84rem;
+  color: #11151a;
+}
+
+.stance-option-copy small {
+  font-size: 0.69rem;
+  color: rgba(17, 21, 26, 0.55);
+}
+
+.stance-check {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  color: #11151a;
+}
