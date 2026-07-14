@@ -23,6 +23,7 @@ type ConfiguratorState = {
   caliperId: string;
   stanceId: string;
   hoodOpen: boolean;
+  leftDoorOpen: boolean;
   headlights: boolean;
   taillights: boolean;
   hazards: boolean;
@@ -39,6 +40,8 @@ type ConfiguratorState = {
   setStanceId: (stanceId: string) => void;
   setHoodOpen: (open: boolean) => void;
   toggleHoodOpen: () => void;
+  setLeftDoorOpen: (open: boolean) => void;
+  toggleLeftDoorOpen: () => void;
   toggleHeadlights: () => void;
   toggleTaillights: () => void;
   toggleHazards: () => void;
@@ -57,6 +60,7 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
   caliperId: "red",
   stanceId: "standard",
   hoodOpen: false,
+  leftDoorOpen: false,
   headlights: false,
   taillights: true,
   hazards: false,
@@ -75,6 +79,9 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
   setStanceId: (stanceId) => set({ stanceId }),
   setHoodOpen: (hoodOpen) => set({ hoodOpen }),
   toggleHoodOpen: () => set((state) => ({ hoodOpen: !state.hoodOpen })),
+  setLeftDoorOpen: (leftDoorOpen) => set({ leftDoorOpen }),
+  toggleLeftDoorOpen: () =>
+    set((state) => ({ leftDoorOpen: !state.leftDoorOpen })),
   toggleHeadlights: () => set((state) => ({ headlights: !state.headlights })),
   toggleTaillights: () => set((state) => ({ taillights: !state.taillights })),
   toggleHazards: () => set((state) => ({ hazards: !state.hazards })),

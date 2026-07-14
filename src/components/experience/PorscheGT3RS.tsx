@@ -11,6 +11,7 @@ import { useConfigurator } from "@/store/configurator";
 
 const MODEL_URL = "/models/porsche-911-gt3-rs-992.glb";
 const HOOD_NODE_NAME = "TwiXeR_992_gt3rs_carbon_hood";
+const LEFT_DOOR_NODE_NAME = "TwiXeR_992_gt3rs_door_L";
 
 type MaterialDefaults = {
   color: THREE.Color;
@@ -64,6 +65,7 @@ function objectHasNamedAncestor(object: THREE.Object3D | null, nodeName: string)
 export function PorscheGT3RS() {
   const group = useRef<THREE.Group>(null);
   const hoodPivot = useRef<THREE.Group | null>(null);
+  const leftDoorPivot = useRef<THREE.Group | null>(null);
   const materialDefaults = useRef(
     new WeakMap<THREE.MeshStandardMaterial, MaterialDefaults>(),
   );
@@ -74,6 +76,8 @@ export function PorscheGT3RS() {
   const caliperId = useConfigurator((state) => state.caliperId);
   const hoodOpen = useConfigurator((state) => state.hoodOpen);
   const toggleHoodOpen = useConfigurator((state) => state.toggleHoodOpen);
+  const leftDoorOpen = useConfigurator((state) => state.leftDoorOpen);
+  const toggleLeftDoorOpen = useConfigurator((state) => state.toggleLeftDoorOpen);
   const headlights = useConfigurator((state) => state.headlights);
   const taillights = useConfigurator((state) => state.taillights);
   const hazards = useConfigurator((state) => state.hazards);
@@ -324,6 +328,16 @@ export function PorscheGT3RS() {
       const target = hoodOpen ? -0.88 : 0;
       hoodPivot.current.rotation.x = THREE.MathUtils.damp(
         hoodPivot.current.rotation.x,
+        target,
+        6.5,
+        delta,
+      );
+    }
+
+    if (leftDoorPivot.current) {
+      const target = leftDoorOpen ? 1.02 : 0;
+      leftDoorPivot.current.rotation.y = THREE.MathUtils.damp(
+        leftDoorPivot.current.rotation.y,
         target,
         6.5,
         delta,
