@@ -9,39 +9,37 @@ import { useConfigurator } from "@/store/configurator";
 
 const MODEL_URL = "/models/porsche-911-gt3-rs-992.glb";
 
-function forEachMaterial(
+function forEachMeshMaterial(
   object: THREE.Object3D,
-  callback: (material: THREE.Material) => void,
+  callback: (mesh: THREE.Mesh, material: THREE.MeshStandardMaterial) => void,
 ) {
   object.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
+
     const materials = Array.isArray(child.material) ? child.material : [child.material];
-    materials.forEach(callback);
+    materials.forEach((material) => {
+      if (material instanceof THREE.MeshStandardMaterial) callback(child, material);
+    });
   });
 }
 
-function updateStandardMaterial(
-  material: THREE.Material,
-  callback: (material: THREE.MeshStandardMaterial) => void,
-) {
-  if (material instanceof THREE.MeshStandardMaterial) callback(material);
-}
-
-function TurnSignal({
+function RearSignalStrip({
   position,
   active,
 }: {
   position: [number, number, number];
   active: boolean;
 }) {
+  if (!active) return null;
+
   return (
-    <mesh position={position} scale={[0.085, 0.032, 0.045]}>
-      <sphereGeometry args={[1, 18, 10]} />
+    <mesh position={position}>
+      <boxGeometry args={[0.2, 0.025, 0.018]} />
       <meshStandardMaterial
-        color={active ? "#ff8a00" : "#2b2117"}
-        emissive="#ff7900"
-        emissiveIntensity={active ? 10 : 0.03}
-        roughness={0.24}
+        color="#ff7a00"
+        emissive="#ff5a00"
+        emissiveIntensity={3.2}
+        roughness={0.18}
         toneMapped={false}
       />
     </mesh>
@@ -83,59 +81,83 @@ export function PorscheGT3RS() {
   useEffect(() => {
     if (!hazards) return;
 
-    const start = window.setTimeout(() => setHazardOn(true), 0);
     const interval = window.setInterval(() => {
       setHazardOn((value) => !value);
     }, 520);
 
-    return () => {
-      window.clearTimeout(start);
-      window.clearInterval(interval);
-    };
+    return () => window.clearInterval(interval);
   }, [hazards]);
 
   useEffect(() => {
-    forEachMaterial(model, (material) => {
-      const name = material.name.toLowerCase();
+    forEachMeshMaterial(model, (mesh, standard) => {
+      const objectName = mesh.name.toLowerCase();
+      const materialName = standard.name.toLowerCase();
 
-      updateStandardMaterial(material, (standard) => {
-        if (name.includes("carpaint.003")) {
-          standard.color.set(paint.color);
-          standard.metalness = paint.metalness;
-          standard.roughness = Math.max(0.12, paint.roughness);
-          standard.envMapIntensity = 1.7;
-        }
+      if (materialName.includes("carpaint.003")) {
+        standard.color.set(paint.color);
+        standard.metalness = paint.metalness;
+        standard.roughness = Math.max(0.12, paint.roughness);
+        standard.envMapIntensity = 1.7;
+      }
 
-        if (name.includes("wheels_chrome")) {
-          standard.color.set("#111318");
-          standard.metalness = 0.92;
-          standard.roughness = 0.2;
-        }
+      if (materialName.includes("wheels_chrome")) {
+        standard.color.set("#111318");
+        standard.metalness = 0.92;
+        standard.roughness = 0.2;
+      }
 
-        if (name.includes("caliper")) {
-          standard.color.set("#c8101e");
-          standard.metalness = 0.38;
-          standard.roughness = 0.3;
-        }
+      if (materialName.includes("caliper")) {
+        standard.color.set("#c8101e");
+        standard.metalness = 0.38;
+        standard.roughness = 0.3;
+      }
 
-        if (
-          name.includes("led_lights") ||
-          name.includes("headlight_high") ||
-          name.includes("headlight_1")
-        ) {
-          standard.emissive.set("#eaf7ff");
-          standard.emissiveIntensity = headlights ? 5.5 : 0.02;
-        }
+      const isHeadlightAssembly =
+        objectName.includes("headlight_l_led") || objectName.includes("headlight_r_led");
+      const isHeadlightEmitter =
+        materialName.includes("led_lights") || materialName.includes("headlight_high");
 
-        if (name.includes("taillight_running") || name.includes("brakelight")) {
-          standard.emissive.set("#ff0b20");
-          standard.emissiveIntensity = taillights ? 5.2 : 0.03;
-        }
+      if (isHeadlightAssembly && isHeadlightEmitter) {
+        standard.color.set(materialName.includes("headlight_high") ? "#d8e5ee" : "#9eabb5");
+        standard.emissive.set("#dff3ff");
+        standard.emissiveIntensity = headlights
+          ? materialName.includes("headlight_high")
+            ? 2.1
+            : 1.45
+          : 0;
+        standard.roughness = materialName.includes("headlight_high") ? 0.08 : 0.18;
+        standard.toneMapped = true;
+      }
 
-        standard.needsUpdate = true;
-      });
+      const isFrontSignal = objectName.includes("signal_l_bumper");
+      if (isFrontSignal) {
+        standard.color.set(hazards && hazardOn ? "#ff8200" : "#24170b");
+        standard.emissive.set("#ff6500");
+        standard.emissiveIntensity = hazards && hazardOn ? 2.8 : 0;
+        standard.roughness = 0.2;
+        standard.metalness = 0;
+        standard.toneMapped = true;
+      }
+
+      const isTailLight =
+        objectName.includes("taillight_running") || objectName.includes("brakelight");
+      if (isTailLight) {
+        standard.color.set(taillights ? "#8f0010" : "#2a0005");
+        standard.emissive.set("#ff1028");
+        standard.emissiveIntensity = taillights
+          ? objectName.includes("brakelight")
+            ? 1.9
+            : 1.55
+          : 0.035;
+        standard.roughness = 0.16;
+        standard.metalness = 0;
+        standard.envMapIntensity = 0.55;
+        standard.toneMapped = true;
+      }
+
+      standard.needsUpdate = true;
     });
-  }, [headlights, model, paint, taillights]);
+  }, [hazardOn, hazards, headlights, model, paint, taillights]);
 
   useFrame((state) => {
     if (!group.current) return;
@@ -154,17 +176,8 @@ export function PorscheGT3RS() {
     <group ref={group} scale={1.1} dispose={null}>
       <primitive object={model} />
 
-      <TurnSignal position={[-0.76, 0.42, 2.22]} active={signalsActive} />
-      <TurnSignal position={[0.76, 0.42, 2.22]} active={signalsActive} />
-      <TurnSignal position={[-0.79, 0.58, -2.34]} active={signalsActive} />
-      <TurnSignal position={[0.79, 0.58, -2.34]} active={signalsActive} />
-
-      {headlights && (
-        <>
-          <pointLight position={[-0.65, 0.62, 2.35]} intensity={8} distance={4.2} color="#eaf7ff" />
-          <pointLight position={[0.65, 0.62, 2.35]} intensity={8} distance={4.2} color="#eaf7ff" />
-        </>
-      )}
+      <RearSignalStrip position={[-0.57, 0.755, -2.205]} active={signalsActive} />
+      <RearSignalStrip position={[0.57, 0.755, -2.205]} active={signalsActive} />
     </group>
   );
 }
