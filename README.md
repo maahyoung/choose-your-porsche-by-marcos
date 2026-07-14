@@ -1,66 +1,36 @@
-# Choose Your Porsche — by Marcos
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-An unofficial, personal learning project for building a premium interactive automotive configurator.
+## Getting Started
 
-## Current milestone: Phase 01 foundation
-
-This first version validates the architecture and visual language before a licensed, configurable Porsche 911 GT3 RS 3D asset is introduced.
-
-Implemented:
-
-- Next.js, TypeScript and Tailwind CSS
-- React Three Fiber / Three.js scene
-- dark reflective circular platform
-- animated red and white speed-light environment
-- touch/mouse 360° orbit controls
-- procedural development vehicle proxy
-- animated paint changes using selected Porsche color names
-- headlights, taillights and hazard controls
-- English and Portuguese interface
-- Performance, Balanced and Ultra rendering modes
-- landscape-oriented tablet/mobile experience
-- intro screen with optional synthesized placeholder audio
-- cinematic build-summary camera mode
-- PNG canvas capture
-- shareable configuration URL parameters
-
-## Important asset note
-
-The current car is intentionally a generic procedural proxy. It must not be presented as the final GT3 RS model. A final asset needs:
-
-- an appropriate license for public web use
-- separated body, wheels, brakes, lights, wing and carbon components
-- editable materials
-- optimized geometry and textures
-- tested performance on iPad and modern phones
-
-## Run locally
+First, run the development server:
 
 ```bash
-npm install
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-Open `http://localhost:3000`.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Validate production
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-```bash
-npm run lint
-npm run build
-```
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Planned next milestones
+## Learn More
 
-1. Replace the development proxy with a properly licensed 992 GT3 RS asset.
-2. Add wheel and brake options.
-3. Add Weissach and exterior package controls.
-4. Add graphics and stripe materials.
-5. Add DRS animation and concept wing-delete mode.
-6. Add suspension-height presentation controls.
-7. Replace synthesized audio with licensed automotive recordings.
-8. Improve screenshot composition with title and MMC signature rendered into the export.
+To learn more about Next.js, take a look at the following resources:
 
-## Trademark notice
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-This is an unofficial personal coding project and is not affiliated with, endorsed by, or sponsored by Porsche AG. Product names are used only to describe the intended learning concept.
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

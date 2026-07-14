@@ -79,6 +79,8 @@ button { font: inherit; color: inherit; }
 .scene-notes { position: absolute; z-index: 8; left: 28px; bottom: 25px; display: flex; flex-direction: column; gap: 6px; }
 .scene-notes span { font-size: .7rem; text-transform: uppercase; letter-spacing: .14em; }
 .scene-notes small { color: rgba(255,255,255,.34); font-size: .61rem; }
+.model-credit a { color: inherit; text-decoration: none; transition: color .2s ease; }
+.model-credit a:hover { color: rgba(255,255,255,.72); }
 
 .summary-overlay { position: absolute; inset: 0; z-index: 30; pointer-events: none; background: linear-gradient(90deg, rgba(2,2,4,.78), transparent 42%, rgba(2,2,4,.25)); }
 .summary-title { position: absolute; left: clamp(24px, 7vw, 110px); top: 50%; transform: translateY(-50%); }
@@ -119,3 +121,121 @@ button { font: inherit; color: inherit; }
   .phone-icon span { display: block; width: 5px; height: 5px; border-radius: 50%; background: white; margin: 6px auto; }
   @keyframes phoneRotate { 50% { transform: rotate(0deg); } }
 }
+
+/* PHASE 02A VISUAL OVERHAUL START */
+.experience-shell::before {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 28% 52%, rgba(228, 0, 39, .2), transparent 27%),
+    radial-gradient(circle at 72% 38%, rgba(123, 0, 22, .14), transparent 31%);
+  filter: blur(28px);
+  animation: ambientPulse 7s ease-in-out infinite alternate;
+}
+@keyframes ambientPulse { to { transform: translate3d(2.5%, -1.5%, 0) scale(1.04); opacity: .76; } }
+.scene-layer { inset: -1.5%; }
+.vignette {
+  background:
+    radial-gradient(circle at 42% 47%, transparent 20%, rgba(0,0,0,.13) 47%, rgba(0,0,0,.82) 108%),
+    linear-gradient(90deg, rgba(0,0,0,.24), transparent 38%, rgba(0,0,0,.14));
+}
+.speed-overlay {
+  opacity: .42;
+  background:
+    repeating-linear-gradient(96deg, transparent 0 10%, rgba(255,0,42,.075) 10.2%, transparent 10.8% 19%),
+    linear-gradient(105deg, transparent 12%, rgba(255,255,255,.025) 48%, transparent 70%);
+  filter: blur(1.8px);
+  animation: phase02Drift 4.8s linear infinite;
+}
+@keyframes phase02Drift { to { transform: translateX(19%) skewX(-3deg); } }
+
+.top-bar {
+  min-height: 76px;
+  padding: 17px 24px;
+  border-bottom-color: rgba(255,255,255,.09);
+  background: linear-gradient(to bottom, rgba(2,2,4,.84), rgba(2,2,4,.12));
+}
+.brand-lockup p { font-size: .86rem; }
+.brand-lockup span { font-size: .62rem; }
+.top-signature { font-size: .78rem; letter-spacing: .58em; }
+
+.configurator-panel {
+  top: 94px;
+  right: 18px;
+  bottom: 18px;
+  width: min(336px, 29vw);
+  grid-template-columns: 92px 1fr;
+  border-radius: 16px;
+  border-color: rgba(255,255,255,.11);
+  background: rgba(7,7,10,.69);
+  box-shadow: 0 24px 90px rgba(0,0,0,.54), inset 0 1px 0 rgba(255,255,255,.035);
+}
+.step-nav { padding: 10px 7px; }
+.step-nav button { padding: 9px 7px; }
+.step-content { padding: 23px 18px; }
+.step-content h2 { font-size: 1.2rem; margin-bottom: 20px; }
+.paint-swatch { border-radius: 10px; padding: 7px; }
+.paint-swatch > span { height: 34px; border-radius: 6px; }
+.view-build-button { height: 50px; }
+.scene-notes { bottom: 29px; }
+
+.project-disclaimer {
+  position: absolute;
+  z-index: 9;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,.28);
+  font-size: .52rem;
+  letter-spacing: .08em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.summary-overlay {
+  background:
+    linear-gradient(90deg, rgba(2,2,4,.83) 0%, rgba(2,2,4,.56) 25%, rgba(2,2,4,.06) 52%, transparent 72%),
+    linear-gradient(0deg, rgba(2,2,4,.3), transparent 36%);
+}
+.summary-title {
+  left: clamp(24px, 5.5vw, 88px);
+  top: auto;
+  bottom: clamp(76px, 10vh, 118px);
+  transform: none;
+  width: min(470px, 38vw);
+}
+.summary-title h2 {
+  font-size: clamp(2.35rem, 4.7vw, 5.4rem);
+  max-width: 470px;
+  margin: 10px 0 18px;
+}
+.summary-specs { display: grid; gap: 7px; }
+.summary-specs span:first-child {
+  color: rgba(255,255,255,.9);
+  font-size: .68rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.summary-specs span:last-child { color: rgba(255,255,255,.58); font-size: .72rem; letter-spacing: .08em; }
+.summary-title .signature { margin-top: 24px; font-size: .82rem; }
+.summary-disclaimer { display: block; margin-top: 18px; color: rgba(255,255,255,.3); font-size: .52rem; letter-spacing: .04em; }
+.summary-actions { right: 22px; bottom: 22px; }
+.summary-actions button { background: rgba(7,7,10,.62); border-color: rgba(255,255,255,.14); }
+
+@media (max-width: 980px) and (orientation: landscape) {
+  .configurator-panel { top: 72px; width: min(306px, 40vw); grid-template-columns: 78px 1fr; }
+  .summary-title { width: min(390px, 46vw); bottom: 62px; }
+  .summary-title h2 { font-size: clamp(2rem, 5.2vw, 4rem); }
+  .project-disclaimer { display: none; }
+}
+
+@media (max-width: 760px) and (orientation: landscape) {
+  .configurator-panel { width: 43vw; grid-template-columns: 66px 1fr; }
+  .summary-title { width: 43vw; left: 18px; }
+  .summary-disclaimer { display: none; }
+}
+/* PHASE 02A VISUAL OVERHAUL END */
+

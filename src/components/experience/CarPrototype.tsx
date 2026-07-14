@@ -80,7 +80,7 @@ export function CarPrototype() {
   });
 
   return (
-    <group ref={group} scale={0.86} dispose={null}>
+    <group ref={group} scale={1.02} dispose={null}>
       {/* Development proxy: intentionally generic until a licensed, configurable GT3 RS asset is prepared. */}
       <mesh castShadow receiveShadow position={[0, 0.18, 0]} scale={[2.9, 0.46, 1.25]}>
         <boxGeometry args={[1, 1, 1]} />

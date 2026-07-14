@@ -40,8 +40,15 @@ export function ConfiguratorExperience() {
           <ConfiguratorPanel />
           <div className="scene-notes">
             <span>{t.drag}</span>
-            <small>{t.placeholder}</small>
+            <small className="model-credit">
+              <a href="https://sketchfab.com/3d-models/porsche-gt3-rs-e738eae819c34d19a31dd066c45e0f3d" target="_blank" rel="noreferrer">
+                {language === "pt" ? "Modelo 3D por Black Snow" : "3D model by Black Snow"}
+              </a>
+              <span aria-hidden="true"> · </span>
+              <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>
+            </small>
           </div>
+          <small className="project-disclaimer">Unofficial personal project · Not affiliated with Porsche AG</small>
         </>
       )}
       <SummaryOverlay />
