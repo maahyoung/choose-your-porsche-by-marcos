@@ -9,6 +9,7 @@ import { RotateDevice } from "@/components/ui/RotateDevice";
 import { SummaryOverlay } from "@/components/ui/SummaryOverlay";
 import { copy } from "@/config/translations";
 import { PAINTS } from "@/config/paints";
+import { CALIPER_OPTIONS } from "@/config/brakes";
 import { useConfigurator } from "@/store/configurator";
 
 const specsCopy = {
@@ -21,6 +22,7 @@ export function ConfiguratorExperience() {
   const language = useConfigurator((state) => state.language);
   const summaryMode = useConfigurator((state) => state.summaryMode);
   const setPaintId = useConfigurator((state) => state.setPaintId);
+  const setCaliperId = useConfigurator((state) => state.setCaliperId);
   const toggleHeadlights = useConfigurator((state) => state.toggleHeadlights);
   const toggleTaillights = useConfigurator((state) => state.toggleTaillights);
   const toggleHazards = useConfigurator((state) => state.toggleHazards);
@@ -32,6 +34,11 @@ export function ConfiguratorExperience() {
 
     if (paint && PAINTS.some((option) => option.id === paint)) {
       setPaintId(paint);
+    }
+
+    const caliper = params.get("caliper");
+    if (caliper && CALIPER_OPTIONS.some((option) => option.id === caliper)) {
+      setCaliperId(caliper);
     }
 
     if (
@@ -54,7 +61,7 @@ export function ConfiguratorExperience() {
     ) {
       toggleHazards();
     }
-  }, [setPaintId, toggleHazards, toggleHeadlights, toggleTaillights]);
+  }, [setCaliperId, setPaintId, toggleHazards, toggleHeadlights, toggleTaillights]);
 
   return (
     <main className="experience-shell">

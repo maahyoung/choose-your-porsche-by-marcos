@@ -5,6 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { getPaint } from "@/config/paints";
+import { getCaliperOption } from "@/config/brakes";
 import { useConfigurator } from "@/store/configurator";
 
 const MODEL_URL = "/models/porsche-911-gt3-rs-992.glb";
@@ -55,12 +56,14 @@ export function PorscheGT3RS() {
   const { scene } = useGLTF(MODEL_URL);
 
   const paintId = useConfigurator((state) => state.paintId);
+  const caliperId = useConfigurator((state) => state.caliperId);
   const headlights = useConfigurator((state) => state.headlights);
   const taillights = useConfigurator((state) => state.taillights);
   const hazards = useConfigurator((state) => state.hazards);
   const transitionNonce = useConfigurator((state) => state.transitionNonce);
 
   const paint = useMemo(() => getPaint(paintId), [paintId]);
+  const caliper = useMemo(() => getCaliperOption(caliperId), [caliperId]);
   const transitionStart = useRef(0);
   const [hazardOn, setHazardOn] = useState(true);
 
@@ -161,10 +164,10 @@ export function PorscheGT3RS() {
       }
 
       if (materialName.includes("caliper")) {
-        standard.color.set("#d20b1c");
-        standard.metalness = 0.38;
-        standard.roughness = 0.24;
-        standard.envMapIntensity = 1.3;
+        standard.color.set(caliper.color);
+        standard.metalness = caliper.metalness;
+        standard.roughness = caliper.roughness;
+        standard.envMapIntensity = caliper.envMapIntensity;
       }
 
       const isHeadlightAssembly =
@@ -231,7 +234,7 @@ export function PorscheGT3RS() {
 
       standard.needsUpdate = true;
     });
-  }, [hazardOn, hazards, headlights, model, paint, taillights]);
+  }, [caliper, hazardOn, hazards, headlights, model, paint, taillights]);
 
   useFrame((state) => {
     if (!group.current) return;

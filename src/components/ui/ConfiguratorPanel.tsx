@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { PAINTS, getPaint } from "@/config/paints";
+import { CALIPER_OPTIONS, getCaliperOption } from "@/config/brakes";
 import { copy } from "@/config/translations";
 import { StepId, useConfigurator } from "@/store/configurator";
 
@@ -75,12 +76,22 @@ function ArrowRightIcon() {
   );
 }
 
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m6 12.5 3.4 3.4L18 7.8" />
+    </svg>
+  );
+}
+
 export function ConfiguratorPanel() {
   const language = useConfigurator((state) => state.language);
   const activeStep = useConfigurator((state) => state.activeStep);
   const setActiveStep = useConfigurator((state) => state.setActiveStep);
   const paintId = useConfigurator((state) => state.paintId);
   const setPaintId = useConfigurator((state) => state.setPaintId);
+  const caliperId = useConfigurator((state) => state.caliperId);
+  const setCaliperId = useConfigurator((state) => state.setCaliperId);
   const headlights = useConfigurator((state) => state.headlights);
   const taillights = useConfigurator((state) => state.taillights);
   const hazards = useConfigurator((state) => state.hazards);
@@ -92,6 +103,7 @@ export function ConfiguratorPanel() {
   const replayTransition = useConfigurator((state) => state.replayTransition);
   const t = copy[language];
   const selectedPaint = getPaint(paintId);
+  const selectedCaliper = getCaliperOption(caliperId);
 
   const openSummary = () => {
     setActiveStep("summary");
@@ -135,14 +147,14 @@ export function ConfiguratorPanel() {
     context.fillStyle = "rgba(17,21,26,0.66)";
     context.font = `${14 * scale}px Arial`;
     context.fillText(
-      `${selectedPaint.name[language]} · 518 HP · 0–60 3.0 s`,
+      `${selectedPaint.name[language]} · ${selectedCaliper.name[language]} ${t.calipers} · 518 HP`,
       52 * scale,
       output.height - 42 * scale,
     );
 
     const anchor = document.createElement("a");
     anchor.href = output.toDataURL("image/png");
-    anchor.download = `choose-your-porsche-${paintId}-by-marcos.png`;
+    anchor.download = `choose-your-porsche-${paintId}-${caliperId}-by-marcos.png`;
     anchor.click();
   };
 
@@ -195,6 +207,40 @@ export function ConfiguratorPanel() {
               </>
             )}
 
+            {activeStep === "wheels" && (
+              <section className="caliper-section" aria-labelledby="caliper-heading">
+                <h2 id="caliper-heading">{t.brakeCalipers}</h2>
+                <div className="caliper-grid">
+                  {CALIPER_OPTIONS.map((option) => {
+                    const active = option.id === caliperId;
+
+                    return (
+                      <button
+                        key={option.id}
+                        className={`caliper-option ${active ? "active" : ""}`}
+                        onClick={() => setCaliperId(option.id)}
+                        aria-pressed={active}
+                      >
+                        <span
+                          className="caliper-color"
+                          style={{ backgroundColor: option.color }}
+                          aria-hidden="true"
+                        />
+                        <span className="caliper-option-copy">
+                          <strong>{option.name[language]}</strong>
+                          <small>{t.brakeCalipers}</small>
+                        </span>
+                        <span className="caliper-check" aria-hidden="true">
+                          {active && <CheckIcon />}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="option-next-note">{t.wheelsNext}</p>
+              </section>
+            )}
+
             {activeStep === "lighting" && (
               <div className="control-stack">
                 <Toggle
@@ -222,6 +268,7 @@ export function ConfiguratorPanel() {
             )}
 
             {activeStep !== "paint" &&
+              activeStep !== "wheels" &&
               activeStep !== "lighting" &&
               activeStep !== "summary" && (
                 <div className="coming-soon">
@@ -233,7 +280,9 @@ export function ConfiguratorPanel() {
             {activeStep === "summary" && (
               <div className="summary-mini">
                 <h2>{t.summaryTitle}</h2>
-                <p>{selectedPaint.name[language]} · MARCOS911</p>
+                <p>
+                  {selectedPaint.name[language]} · {selectedCaliper.name[language]} {t.calipers} · MARCOS911
+                </p>
 
                 {summaryMode && (
                   <div className="summary-panel-actions" aria-label="Summary actions">

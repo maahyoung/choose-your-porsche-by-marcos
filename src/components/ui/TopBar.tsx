@@ -60,6 +60,8 @@ export function TopBar() {
   const soundEnabled = useConfigurator((state) => state.soundEnabled);
   const setSoundEnabled = useConfigurator((state) => state.setSoundEnabled);
   const quality = useConfigurator((state) => state.quality);
+  const paintId = useConfigurator((state) => state.paintId);
+  const caliperId = useConfigurator((state) => state.caliperId);
   const setQuality = useConfigurator((state) => state.setQuality);
 
   const [copied, setCopied] = useState(false);
@@ -72,7 +74,10 @@ export function TopBar() {
   };
 
   const shareBuild = async () => {
-    const url = window.location.href;
+    const buildUrl = new URL(window.location.href);
+    buildUrl.searchParams.set("paint", paintId);
+    buildUrl.searchParams.set("caliper", caliperId);
+    const url = buildUrl.toString();
 
     try {
       if (navigator.share) {

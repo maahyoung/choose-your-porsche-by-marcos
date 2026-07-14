@@ -853,3 +853,138 @@ body {
   }
 }
 /* PHASE 02B END */
+
+
+/* PHASE 02C — BRAKE CALIPER OPTIONS */
+
+.caliper-section h2 {
+  margin-bottom: 16px;
+}
+
+.caliper-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.caliper-option {
+  min-height: 58px;
+  width: 100%;
+  padding: 9px 10px;
+  display: grid;
+  grid-template-columns: 38px 1fr 24px;
+  align-items: center;
+  gap: 11px;
+  border: 1px solid rgba(18, 22, 27, 0.09);
+  border-radius: 13px;
+  color: rgba(18, 22, 27, 0.72);
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  text-align: left;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.caliper-option:hover {
+  transform: translateY(-1px);
+  color: #11151a;
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.caliper-option.active {
+  color: #11151a;
+  border-color: rgba(18, 22, 27, 0.22);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.58), rgba(235, 239, 243, 0.28));
+  box-shadow:
+    0 9px 24px rgba(35, 42, 51, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.76);
+}
+
+.caliper-color {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(18, 22, 27, 0.14);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.46),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.17),
+    0 4px 10px rgba(18, 22, 27, 0.08);
+}
+
+.caliper-option-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.caliper-option-copy strong {
+  font-size: 0.74rem;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+}
+
+.caliper-option-copy small {
+  color: rgba(18, 22, 27, 0.42);
+  font-size: 0.54rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.caliper-check {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.caliper-option.active .caliper-check {
+  color: #ffffff;
+  background: #11151a;
+}
+
+.caliper-check svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.option-next-note {
+  margin: 15px 2px 0;
+  color: rgba(18, 22, 27, 0.42);
+  font-size: 0.59rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 760px) and (orientation: landscape) {
+  .caliper-option {
+    min-height: 50px;
+    grid-template-columns: 32px 1fr 20px;
+    gap: 8px;
+    padding: 7px 8px;
+  }
+
+  .caliper-color {
+    width: 32px;
+    height: 32px;
+  }
+
+  .caliper-option-copy strong {
+    font-size: 0.62rem;
+  }
+
+  .caliper-option-copy small {
+    font-size: 0.46rem;
+  }
+}
+
+/* PHASE 02C END */
