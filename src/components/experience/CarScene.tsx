@@ -12,7 +12,7 @@ import * as THREE from "three";
 import { PorscheGT3RS } from "./PorscheGT3RS";
 import { useConfigurator } from "@/store/configurator";
 
-const SCENE_OFFSET_X = -1.34;
+const SCENE_OFFSET_X = -1.52;
 
 function CameraDirector() {
   const summaryMode = useConfigurator((state) => state.summaryMode);
@@ -24,9 +24,9 @@ function CameraDirector() {
 
     const time = state.clock.elapsedTime * 0.18;
     const desired = new THREE.Vector3(
-      SCENE_OFFSET_X + Math.sin(time) * 5.0,
+      SCENE_OFFSET_X + Math.sin(time) * 4.95,
       1.72 + Math.sin(time * 1.6) * 0.2,
-      Math.cos(time) * 5.55,
+      Math.cos(time) * 5.5,
     );
 
     camera.position.lerp(desired, 1 - Math.pow(0.002, delta));

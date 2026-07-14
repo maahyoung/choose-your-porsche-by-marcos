@@ -1,4 +1,22 @@
-/* White Showroom Reset — GT3 RS Experience v4 */
+@font-face {
+  font-family: "Porscha911Title";
+  src: url("/fonts/911porschav3title.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Porscha911Bold";
+  src: url("/fonts/911porschav3bold.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Porscha911Regular";
+  src: url("/fonts/911porschav3.ttf") format("truetype");
+  font-display: swap;
+}
+
+/* White Showroom Reset — GT3 RS Experience v5 */
 
 :root {
   --background: #eef1f4;
@@ -63,7 +81,7 @@ body {
 .showroom-floor-glow {
   position: absolute;
   z-index: 0;
-  left: 32%;
+  left: 31%;
   bottom: 2%;
   width: min(88vw, 1280px);
   height: min(27vw, 350px);
@@ -130,22 +148,24 @@ body {
 }
 
 .nine-eleven {
-  font-size: 1.62rem;
+  font-family: "Porscha911Title", "Porscha911Bold", sans-serif;
+  font-size: 1.72rem;
   line-height: 1;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-weight: 400;
+  letter-spacing: 0.02em;
   color: #11151a;
+  text-transform: uppercase;
 }
 
 .by-marcos-script {
   position: absolute;
-  left: 54px;
-  bottom: -2px;
+  left: 58px;
+  bottom: -3px;
   display: inline-block;
   transform: rotate(-14deg);
   transform-origin: left bottom;
   font-family: "Brush Script MT", "Snell Roundhand", "Segoe Script", cursive;
-  font-size: 0.66rem;
+  font-size: 0.64rem;
   color: rgba(17, 21, 26, 0.76);
   white-space: nowrap;
 }
@@ -161,7 +181,8 @@ body {
   display: block;
   width: 176px;
   height: auto;
-  opacity: 0.98;
+  opacity: 1;
+  filter: brightness(0) saturate(100%);
 }
 
 .language-toggle,
@@ -190,7 +211,10 @@ body {
 }
 
 .configurator-panel {
-  position: relative;
+  position: absolute !important;
+  top: 118px;
+  right: 24px;
+  left: auto !important;
   z-index: 30;
   color: #12161b;
   border-color: rgba(18, 22, 27, 0.11);
@@ -198,10 +222,6 @@ body {
   box-shadow:
     0 24px 80px rgba(35, 42, 51, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.78);
-}
-
-.summary-overlay {
-  z-index: 40;
 }
 
 .step-nav {
@@ -296,7 +316,7 @@ body {
 .bottom-specs {
   position: absolute;
   z-index: 9;
-  left: 32%;
+  left: 31%;
   bottom: 22px;
   transform: translateX(-50%);
   display: flex;
@@ -316,6 +336,10 @@ body {
   text-transform: uppercase;
   color: rgba(18, 22, 27, 0.56);
   white-space: nowrap;
+}
+
+.summary-overlay {
+  z-index: 40;
 }
 
 .summary-title,
@@ -384,7 +408,7 @@ body {
 
 @media (max-width: 980px) and (orientation: landscape) {
   .showroom-floor-glow {
-    left: 30%;
+    left: 29%;
     width: 80vw;
   }
 
@@ -397,8 +421,13 @@ body {
     width: 138px;
   }
 
+  .configurator-panel {
+    right: 18px;
+    top: 112px;
+  }
+
   .bottom-specs {
-    left: 30%;
+    left: 29%;
     gap: 10px;
     padding: 7px 12px;
   }
@@ -422,7 +451,8 @@ body {
   }
 
   .nine-eleven {
-    font-size: 1.16rem;
+    font-family: "Porscha911Title", "Porscha911Bold", sans-serif;
+    font-size: 1.22rem;
   }
 
   .by-marcos-script {
@@ -435,9 +465,14 @@ body {
     width: 104px;
   }
 
+  .configurator-panel {
+    right: 12px;
+    top: 108px;
+  }
+
   .bottom-specs {
     gap: 8px;
-    left: 28%;
+    left: 27%;
     bottom: 18px;
   }
 
