@@ -1,8 +1,10 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { PAINTS, getPaint } from "@/config/paints";
 import { CALIPER_OPTIONS, getCaliperOption } from "@/config/brakes";
+import { WHEEL_FINISH_OPTIONS, getWheelFinishOption } from "@/config/wheels";
 import { copy } from "@/config/translations";
 import { StepId, useConfigurator } from "@/store/configurator";
 
@@ -90,6 +92,8 @@ export function ConfiguratorPanel() {
   const setActiveStep = useConfigurator((state) => state.setActiveStep);
   const paintId = useConfigurator((state) => state.paintId);
   const setPaintId = useConfigurator((state) => state.setPaintId);
+  const wheelId = useConfigurator((state) => state.wheelId);
+  const setWheelId = useConfigurator((state) => state.setWheelId);
   const caliperId = useConfigurator((state) => state.caliperId);
   const setCaliperId = useConfigurator((state) => state.setCaliperId);
   const headlights = useConfigurator((state) => state.headlights);
@@ -103,6 +107,7 @@ export function ConfiguratorPanel() {
   const replayTransition = useConfigurator((state) => state.replayTransition);
   const t = copy[language];
   const selectedPaint = getPaint(paintId);
+  const selectedWheel = getWheelFinishOption(wheelId);
   const selectedCaliper = getCaliperOption(caliperId);
 
   const openSummary = () => {
@@ -147,14 +152,14 @@ export function ConfiguratorPanel() {
     context.fillStyle = "rgba(17,21,26,0.66)";
     context.font = `${14 * scale}px Arial`;
     context.fillText(
-      `${selectedPaint.name[language]} · ${selectedCaliper.name[language]} ${t.calipers} · 518 HP`,
+      `${selectedPaint.name[language]} · ${selectedWheel.name[language]} · ${selectedCaliper.name[language]} ${t.calipers} · 518 HP`,
       52 * scale,
       output.height - 42 * scale,
     );
 
     const anchor = document.createElement("a");
     anchor.href = output.toDataURL("image/png");
-    anchor.download = `choose-your-porsche-${paintId}-${caliperId}-by-marcos.png`;
+    anchor.download = `choose-your-porsche-${paintId}-${wheelId}-${caliperId}-by-marcos.png`;
     anchor.click();
   };
 
@@ -208,37 +213,69 @@ export function ConfiguratorPanel() {
             )}
 
             {activeStep === "wheels" && (
-              <section className="caliper-section" aria-labelledby="caliper-heading">
-                <h2 id="caliper-heading">{t.brakeCalipers}</h2>
-                <div className="caliper-grid">
-                  {CALIPER_OPTIONS.map((option) => {
-                    const active = option.id === caliperId;
+              <div className="wheel-brake-options">
+                <section className="wheel-finish-section" aria-labelledby="wheel-finish-heading">
+                  <h2 id="wheel-finish-heading">{t.wheelFinish}</h2>
+                  <div className="wheel-finish-grid">
+                    {WHEEL_FINISH_OPTIONS.map((option) => {
+                      const active = option.id === wheelId;
 
-                    return (
-                      <button
-                        key={option.id}
-                        className={`caliper-option ${active ? "active" : ""}`}
-                        onClick={() => setCaliperId(option.id)}
-                        aria-pressed={active}
-                      >
-                        <span
-                          className="caliper-color"
-                          style={{ backgroundColor: option.color }}
-                          aria-hidden="true"
-                        />
-                        <span className="caliper-option-copy">
-                          <strong>{option.name[language]}</strong>
-                          <small>{t.brakeCalipers}</small>
-                        </span>
-                        <span className="caliper-check" aria-hidden="true">
-                          {active && <CheckIcon />}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="option-next-note">{t.wheelsNext}</p>
-              </section>
+                      return (
+                        <button
+                          key={option.id}
+                          className={`wheel-finish-option ${active ? "active" : ""}`}
+                          onClick={() => setWheelId(option.id)}
+                          aria-pressed={active}
+                        >
+                          <span
+                            className="wheel-finish-preview"
+                            style={{ "--wheel-finish": option.color } as CSSProperties}
+                            aria-hidden="true"
+                          >
+                            <i />
+                          </span>
+                          <small>{option.name[language]}</small>
+                          <span className="wheel-finish-check" aria-hidden="true">
+                            {active && <CheckIcon />}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="option-next-note">{t.wheelDesignNote}</p>
+                </section>
+
+                <section className="caliper-section" aria-labelledby="caliper-heading">
+                  <h2 id="caliper-heading">{t.brakeCalipers}</h2>
+                  <div className="caliper-grid">
+                    {CALIPER_OPTIONS.map((option) => {
+                      const active = option.id === caliperId;
+
+                      return (
+                        <button
+                          key={option.id}
+                          className={`caliper-option ${active ? "active" : ""}`}
+                          onClick={() => setCaliperId(option.id)}
+                          aria-pressed={active}
+                        >
+                          <span
+                            className="caliper-color"
+                            style={{ backgroundColor: option.color }}
+                            aria-hidden="true"
+                          />
+                          <span className="caliper-option-copy">
+                            <strong>{option.name[language]}</strong>
+                            <small>{t.brakeCalipers}</small>
+                          </span>
+                          <span className="caliper-check" aria-hidden="true">
+                            {active && <CheckIcon />}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+              </div>
             )}
 
             {activeStep === "lighting" && (
@@ -281,7 +318,7 @@ export function ConfiguratorPanel() {
               <div className="summary-mini">
                 <h2>{t.summaryTitle}</h2>
                 <p>
-                  {selectedPaint.name[language]} · {selectedCaliper.name[language]} {t.calipers} · MARCOS911
+                  {selectedPaint.name[language]} · {selectedWheel.name[language]} · {selectedCaliper.name[language]} {t.calipers} · MARCOS911
                 </p>
 
                 {summaryMode && (

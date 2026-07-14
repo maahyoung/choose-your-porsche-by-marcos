@@ -10,6 +10,7 @@ import { SummaryOverlay } from "@/components/ui/SummaryOverlay";
 import { copy } from "@/config/translations";
 import { PAINTS } from "@/config/paints";
 import { CALIPER_OPTIONS } from "@/config/brakes";
+import { WHEEL_FINISH_OPTIONS } from "@/config/wheels";
 import { useConfigurator } from "@/store/configurator";
 
 const specsCopy = {
@@ -22,6 +23,7 @@ export function ConfiguratorExperience() {
   const language = useConfigurator((state) => state.language);
   const summaryMode = useConfigurator((state) => state.summaryMode);
   const setPaintId = useConfigurator((state) => state.setPaintId);
+  const setWheelId = useConfigurator((state) => state.setWheelId);
   const setCaliperId = useConfigurator((state) => state.setCaliperId);
   const toggleHeadlights = useConfigurator((state) => state.toggleHeadlights);
   const toggleTaillights = useConfigurator((state) => state.toggleTaillights);
@@ -34,6 +36,11 @@ export function ConfiguratorExperience() {
 
     if (paint && PAINTS.some((option) => option.id === paint)) {
       setPaintId(paint);
+    }
+
+    const wheel = params.get("wheel");
+    if (wheel && WHEEL_FINISH_OPTIONS.some((option) => option.id === wheel)) {
+      setWheelId(wheel);
     }
 
     const caliper = params.get("caliper");
@@ -61,7 +68,14 @@ export function ConfiguratorExperience() {
     ) {
       toggleHazards();
     }
-  }, [setCaliperId, setPaintId, toggleHazards, toggleHeadlights, toggleTaillights]);
+  }, [
+    setCaliperId,
+    setPaintId,
+    setWheelId,
+    toggleHazards,
+    toggleHeadlights,
+    toggleTaillights,
+  ]);
 
   return (
     <main className="experience-shell">

@@ -19,6 +19,7 @@ type ConfiguratorState = {
   quality: Quality;
   activeStep: StepId;
   paintId: string;
+  wheelId: string;
   caliperId: string;
   headlights: boolean;
   taillights: boolean;
@@ -31,6 +32,7 @@ type ConfiguratorState = {
   setQuality: (quality: Quality) => void;
   setActiveStep: (step: StepId) => void;
   setPaintId: (paintId: string) => void;
+  setWheelId: (wheelId: string) => void;
   setCaliperId: (caliperId: string) => void;
   toggleHeadlights: () => void;
   toggleTaillights: () => void;
@@ -46,6 +48,7 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
   quality: "balanced",
   activeStep: "paint",
   paintId: "white",
+  wheelId: "satin-black",
   caliperId: "red",
   headlights: false,
   taillights: true,
@@ -60,6 +63,7 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
   setActiveStep: (activeStep) => set({ activeStep }),
   setPaintId: (paintId) =>
     set((state) => ({ paintId, transitionNonce: state.transitionNonce + 1 })),
+  setWheelId: (wheelId) => set({ wheelId }),
   setCaliperId: (caliperId) => set({ caliperId }),
   toggleHeadlights: () => set((state) => ({ headlights: !state.headlights })),
   toggleTaillights: () => set((state) => ({ taillights: !state.taillights })),

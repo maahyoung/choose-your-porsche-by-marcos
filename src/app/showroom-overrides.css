@@ -988,3 +988,174 @@ body {
 }
 
 /* PHASE 02C END */
+
+
+/* PHASE 02D — WHEEL FINISH OPTIONS */
+
+.wheel-brake-options {
+  display: grid;
+  gap: 23px;
+}
+
+.wheel-finish-section h2,
+.caliper-section h2 {
+  margin-bottom: 13px;
+}
+
+.wheel-finish-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.wheel-finish-option {
+  position: relative;
+  min-width: 0;
+  padding: 8px 5px 9px;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  border: 1px solid rgba(18, 22, 27, 0.09);
+  border-radius: 12px;
+  color: rgba(18, 22, 27, 0.58);
+  background: rgba(255, 255, 255, 0.18);
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.48);
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.wheel-finish-option:hover {
+  transform: translateY(-1px);
+  color: #11151a;
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.wheel-finish-option.active {
+  color: #11151a;
+  border-color: rgba(18, 22, 27, 0.22);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.6), rgba(235, 239, 243, 0.28));
+  box-shadow:
+    0 8px 20px rgba(35, 42, 51, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.76);
+}
+
+.wheel-finish-preview {
+  --wheel-finish: #11141a;
+  position: relative;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 4px solid var(--wheel-finish);
+  background:
+    radial-gradient(circle, #20242a 0 15%, transparent 16%),
+    conic-gradient(
+      from 0deg,
+      transparent 0 8%,
+      var(--wheel-finish) 9% 16%,
+      transparent 17% 28%,
+      var(--wheel-finish) 29% 36%,
+      transparent 37% 48%,
+      var(--wheel-finish) 49% 56%,
+      transparent 57% 68%,
+      var(--wheel-finish) 69% 76%,
+      transparent 77% 88%,
+      var(--wheel-finish) 89% 96%,
+      transparent 97%
+    );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.25),
+    inset 0 0 0 7px rgba(9, 11, 15, 0.2),
+    0 5px 11px rgba(18, 22, 27, 0.1);
+}
+
+.wheel-finish-preview::after {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--wheel-finish);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.28);
+}
+
+.wheel-finish-preview i {
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.42), transparent 42%);
+  pointer-events: none;
+}
+
+.wheel-finish-option > small {
+  max-width: 100%;
+  overflow: hidden;
+  color: inherit;
+  font-size: 0.53rem;
+  line-height: 1.2;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wheel-finish-check {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.wheel-finish-option.active .wheel-finish-check {
+  color: #fff;
+  background: #11151a;
+}
+
+.wheel-finish-check svg {
+  width: 11px;
+  height: 11px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wheel-brake-options .option-next-note {
+  margin-top: 10px;
+}
+
+@media (max-width: 760px) and (orientation: landscape) {
+  .wheel-brake-options {
+    gap: 16px;
+  }
+
+  .wheel-finish-grid {
+    gap: 5px;
+  }
+
+  .wheel-finish-option {
+    padding: 6px 3px 7px;
+  }
+
+  .wheel-finish-preview {
+    width: 31px;
+    height: 31px;
+    border-width: 3px;
+  }
+
+  .wheel-finish-option > small {
+    font-size: 0.45rem;
+  }
+}
+
+/* PHASE 02D END */

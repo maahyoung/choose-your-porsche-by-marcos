@@ -6,6 +6,7 @@ import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { getPaint } from "@/config/paints";
 import { getCaliperOption } from "@/config/brakes";
+import { getWheelFinishOption } from "@/config/wheels";
 import { useConfigurator } from "@/store/configurator";
 
 const MODEL_URL = "/models/porsche-911-gt3-rs-992.glb";
@@ -56,6 +57,7 @@ export function PorscheGT3RS() {
   const { scene } = useGLTF(MODEL_URL);
 
   const paintId = useConfigurator((state) => state.paintId);
+  const wheelId = useConfigurator((state) => state.wheelId);
   const caliperId = useConfigurator((state) => state.caliperId);
   const headlights = useConfigurator((state) => state.headlights);
   const taillights = useConfigurator((state) => state.taillights);
@@ -63,6 +65,7 @@ export function PorscheGT3RS() {
   const transitionNonce = useConfigurator((state) => state.transitionNonce);
 
   const paint = useMemo(() => getPaint(paintId), [paintId]);
+  const wheel = useMemo(() => getWheelFinishOption(wheelId), [wheelId]);
   const caliper = useMemo(() => getCaliperOption(caliperId), [caliperId]);
   const transitionStart = useRef(0);
   const [hazardOn, setHazardOn] = useState(true);
@@ -152,10 +155,10 @@ export function PorscheGT3RS() {
       }
 
       if (materialName.includes("wheels_chrome")) {
-        standard.color.set("#11141a");
-        standard.metalness = 0.94;
-        standard.roughness = 0.16;
-        standard.envMapIntensity = 2.0;
+        standard.color.set(wheel.color);
+        standard.metalness = wheel.metalness;
+        standard.roughness = wheel.roughness;
+        standard.envMapIntensity = wheel.envMapIntensity;
       }
 
       if (materialName.includes("glass")) {
@@ -234,7 +237,7 @@ export function PorscheGT3RS() {
 
       standard.needsUpdate = true;
     });
-  }, [caliper, hazardOn, hazards, headlights, model, paint, taillights]);
+  }, [caliper, hazardOn, hazards, headlights, model, paint, taillights, wheel]);
 
   useFrame((state) => {
     if (!group.current) return;
