@@ -9,6 +9,16 @@ import { useConfigurator } from "@/store/configurator";
 
 const MODEL_URL = "/models/porsche-911-gt3-rs-992.glb";
 
+type MaterialDefaults = {
+  color: THREE.Color;
+  emissive: THREE.Color;
+  emissiveIntensity: number;
+  roughness: number;
+  metalness: number;
+  envMapIntensity: number;
+  toneMapped: boolean;
+};
+
 function forEachMeshMaterial(
   object: THREE.Object3D,
   callback: (mesh: THREE.Mesh, material: THREE.MeshStandardMaterial) => void,
@@ -18,54 +28,30 @@ function forEachMeshMaterial(
 
     const materials = Array.isArray(child.material) ? child.material : [child.material];
     materials.forEach((material) => {
-      if (material instanceof THREE.MeshStandardMaterial) callback(child, material);
+      if (material instanceof THREE.MeshStandardMaterial) {
+        callback(child, material);
+      }
     });
   });
 }
 
-function ShowroomPlinth() {
-  return (
-    <group position={[0, -0.72, 0]}>
-      {/* soft contact shadow around base */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.015, 0]}>
-        <circleGeometry args={[3.6, 96]} />
-        <meshBasicMaterial color="#000000" transparent opacity={0.06} />
-      </mesh>
-
-      {/* plinth body */}
-      <mesh receiveShadow castShadow>
-        <cylinderGeometry args={[3.02, 3.16, 0.22, 96]} />
-        <meshStandardMaterial color="#eef1f4" roughness={0.72} metalness={0.05} />
-      </mesh>
-
-      {/* top deck */}
-      <mesh receiveShadow castShadow position={[0, 0.085, 0]}>
-        <cylinderGeometry args={[2.92, 2.98, 0.03, 96]} />
-        <meshStandardMaterial
-          color="#f8fafc"
-          roughness={0.24}
-          metalness={0.08}
-          envMapIntensity={0.6}
-        />
-      </mesh>
-
-      {/* subtle highlight ring to define silhouette */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.102, 0]}>
-        <ringGeometry args={[2.72, 2.95, 96]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.32} />
-      </mesh>
-
-      {/* soft reflection area below the car */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.103, 0]}>
-        <circleGeometry args={[2.3, 96]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.1} />
-      </mesh>
-    </group>
-  );
+function captureDefaults(material: THREE.MeshStandardMaterial): MaterialDefaults {
+  return {
+    color: material.color.clone(),
+    emissive: material.emissive.clone(),
+    emissiveIntensity: material.emissiveIntensity,
+    roughness: material.roughness,
+    metalness: material.metalness,
+    envMapIntensity: material.envMapIntensity,
+    toneMapped: material.toneMapped,
+  };
 }
 
 export function PorscheGT3RS() {
   const group = useRef<THREE.Group>(null);
+  const materialDefaults = useRef(
+    new WeakMap<THREE.MeshStandardMaterial, MaterialDefaults>(),
+  );
   const { scene } = useGLTF(MODEL_URL);
 
   const paintId = useConfigurator((state) => state.paintId);
@@ -86,9 +72,20 @@ export function PorscheGT3RS() {
 
       child.castShadow = true;
       child.receiveShadow = true;
+
+      const cloneMaterial = (material: THREE.Material) => {
+        const cloned = material.clone();
+
+        if (cloned instanceof THREE.MeshStandardMaterial) {
+          materialDefaults.current.set(cloned, captureDefaults(cloned));
+        }
+
+        return cloned;
+      };
+
       child.material = Array.isArray(child.material)
-        ? child.material.map((material) => material.clone())
-        : child.material.clone();
+        ? child.material.map(cloneMaterial)
+        : cloneMaterial(child.material);
     });
 
     return clone;
@@ -105,6 +102,7 @@ export function PorscheGT3RS() {
     }
 
     setHazardOn(true);
+
     const interval = window.setInterval(() => {
       setHazardOn((value) => !value);
     }, 520);
@@ -116,30 +114,28 @@ export function PorscheGT3RS() {
     forEachMeshMaterial(model, (mesh, standard) => {
       const objectName = mesh.name.toLowerCase();
       const materialName = standard.name.toLowerCase();
+      const defaults = materialDefaults.current.get(standard);
 
-      // Paint
       if (materialName.includes("carpaint.003")) {
         standard.color.set(paint.color);
         standard.metalness = paint.metalness;
         standard.roughness = Math.max(0.14, paint.roughness);
-        standard.envMapIntensity = 1.45;
+        standard.envMapIntensity = 1.42;
       }
 
-      // Wheels
       if (materialName.includes("wheels_chrome")) {
-        standard.color.set("#14171c");
+        standard.color.set("#15181d");
         standard.metalness = 0.9;
         standard.roughness = 0.24;
+        standard.envMapIntensity = 1.1;
       }
 
-      // Calipers
       if (materialName.includes("caliper")) {
         standard.color.set("#c8101e");
         standard.metalness = 0.32;
         standard.roughness = 0.34;
       }
 
-      // Headlights: preserve more of the original material feel
       const isHeadlightAssembly =
         objectName.includes("headlight_l_led") ||
         objectName.includes("headlight_r_led") ||
@@ -151,28 +147,25 @@ export function PorscheGT3RS() {
         materialName.includes("headlight_1");
 
       if (isHeadlightAssembly && isHeadlightEmitter) {
-        // do not paint the whole surface white; keep subtle lens/emitter behavior
-        if (materialName.includes("headlight_high")) {
-          standard.color.set("#cfd8df");
-          standard.emissive.set("#f4f8ff");
-          standard.emissiveIntensity = headlights ? 1.05 : 0.0;
-          standard.roughness = 0.1;
-          standard.metalness = 0.06;
-        } else {
-          standard.color.set("#9aa6af");
-          standard.emissive.set("#eef6ff");
-          standard.emissiveIntensity = headlights ? 0.48 : 0.0;
-          standard.roughness = 0.22;
-          standard.metalness = 0.04;
+        if (defaults) {
+          standard.color.copy(defaults.color);
+          standard.roughness = defaults.roughness;
+          standard.metalness = defaults.metalness;
+          standard.envMapIntensity = Math.max(defaults.envMapIntensity, 0.9);
+          standard.toneMapped = defaults.toneMapped;
         }
 
-        standard.envMapIntensity = 1.1;
-        standard.toneMapped = true;
+        standard.emissive.set("#eef7ff");
+        standard.emissiveIntensity = headlights
+          ? materialName.includes("headlight_high")
+            ? 0.72
+            : 0.34
+          : 0;
       }
 
-      // Front turn signals: keep the good behavior, but ensure both sides can respond
       const isFrontSignal =
-        objectName.includes("signal_l_bumper") || objectName.includes("signal_r_bumper");
+        objectName.includes("signal_l_bumper") ||
+        objectName.includes("signal_r_bumper");
 
       if (isFrontSignal) {
         standard.color.set(hazards && hazardOn ? "#ff8a00" : "#2b1a0e");
@@ -183,14 +176,28 @@ export function PorscheGT3RS() {
         standard.toneMapped = true;
       }
 
-      // Rear lights: only use native model materials, no extra floating mesh
+      const isNativeRearSignal =
+        (objectName.includes("signal") || materialName.includes("signal")) &&
+        (objectName.includes("rear") ||
+          objectName.includes("tail") ||
+          materialName.includes("rear") ||
+          materialName.includes("tail"));
+
+      if (isNativeRearSignal) {
+        standard.color.set(hazards && hazardOn ? "#ff7a00" : "#33180a");
+        standard.emissive.set("#ff6500");
+        standard.emissiveIntensity = hazards && hazardOn ? 1.8 : 0;
+        standard.roughness = 0.2;
+        standard.metalness = 0;
+      }
+
       const isTailLight =
         objectName.includes("taillight_running") ||
         objectName.includes("brakelight") ||
-        materialName.includes("taillight") ||
+        materialName.includes("taillight_running") ||
         materialName.includes("brakelight");
 
-      if (isTailLight) {
+      if (isTailLight && !isNativeRearSignal) {
         standard.color.set(taillights ? "#8f0010" : "#250005");
         standard.emissive.set("#ff1028");
         standard.emissiveIntensity = taillights
@@ -215,17 +222,34 @@ export function PorscheGT3RS() {
     const pulse = elapsed < 900 ? Math.sin((elapsed / 900) * Math.PI) : 0;
 
     group.current.position.x = pulse * 0.42;
-    group.current.position.y = -0.06 + Math.sin(state.clock.elapsedTime * 0.72) * 0.006;
-    group.current.rotation.y = -0.08 + state.pointer.x * 0.022 + pulse * 0.06;
+    group.current.position.y =
+      -0.14 + Math.sin(state.clock.elapsedTime * 0.72) * 0.006;
+    group.current.rotation.y =
+      -0.08 + state.pointer.x * 0.022 + pulse * 0.06;
   });
 
   return (
-    <group dispose={null}>
-      <ShowroomPlinth />
+    <group ref={group} scale={1.1} dispose={null}>
+      <primitive object={model} />
 
-      <group ref={group} scale={1.1}>
-        <primitive object={model} />
-      </group>
+      {headlights && (
+        <>
+          <pointLight
+            position={[-0.65, 0.62, 2.3]}
+            intensity={2.3}
+            distance={3.2}
+            decay={2}
+            color="#eaf6ff"
+          />
+          <pointLight
+            position={[0.65, 0.62, 2.3]}
+            intensity={2.3}
+            distance={3.2}
+            decay={2}
+            color="#eaf6ff"
+          />
+        </>
+      )}
     </group>
   );
 }
