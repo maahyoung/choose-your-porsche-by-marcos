@@ -1,0 +1,109 @@
+name: Apply Porsche branding and rear signals
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-experience:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Apply branding and lighting updates
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python <<'PY'
+          from pathlib import Path
+
+          signature_path = Path("src/components/ui/Signature.tsx")
+          signature_path.write_text(
+              '''export function Signature({ className = "" }: { className?: string }) {
+            return (
+              <span className={`signature ${className}`} aria-label="Porsche wordmark">
+                PORSCHE
+              </span>
+            );
+          }
+          ''',
+              encoding="utf-8",
+          )
+
+          car_path = Path("src/components/experience/CarPrototype.tsx")
+          car = car_path.read_text(encoding="utf-8")
+
+          front_signals = '''      <LightLens position={[1.6, 0.26, -0.58]} scale={[0.09, 0.055, 0.12]} color="#ff8a00" active={hazards && hazardOn} />
+                <LightLens position={[1.6, 0.26, 0.58]} scale={[0.09, 0.055, 0.12]} color="#ff8a00" active={hazards && hazardOn} />
+          '''
+          rear_signals = '''      <LightLens position={[-1.77, 0.26, -0.58]} scale={[0.09, 0.055, 0.12]} color="#ff8a00" active={hazards && hazardOn} />
+                <LightLens position={[-1.77, 0.26, 0.58]} scale={[0.09, 0.055, 0.12]} color="#ff8a00" active={hazards && hazardOn} />
+          '''
+
+          if rear_signals not in car:
+              if front_signals not in car:
+                  raise SystemExit("Could not locate the front signal block.")
+              car = car.replace(front_signals, front_signals + rear_signals, 1)
+              car_path.write_text(car, encoding="utf-8")
+
+          css_path = Path("src/app/globals.css")
+          css = css_path.read_text(encoding="utf-8")
+
+          old_signature = '.signature { display: inline-block; font-family: "Brush Script MT", "Segoe Script", cursive; font-size: 2.2rem; font-weight: 500; letter-spacing: -.12em; transform: skew(-8deg); }'
+          new_signature = '.signature { display: inline-block; font-family: Arial, Helvetica, sans-serif; font-size: 1.15rem; font-weight: 700; letter-spacing: .42em; line-height: 1; white-space: nowrap; }'
+
+          old_top = '.top-signature { position: absolute; left: 50%; transform: translateX(-50%) skew(-8deg); font-size: 1.8rem; }'
+          new_top = '.top-signature { position: absolute; left: 50%; transform: translateX(-50%); font-size: .9rem; letter-spacing: .52em; }'
+
+          if old_signature in css:
+              css = css.replace(old_signature, new_signature, 1)
+          elif new_signature not in css:
+              raise SystemExit("Could not locate the signature style.")
+
+          if old_top in css:
+              css = css.replace(old_top, new_top, 1)
+          elif new_top not in css:
+              raise SystemExit("Could not locate the top signature style.")
+
+          css_path.write_text(css, encoding="utf-8")
+          PY
+
+      - name: Install dependencies
+        run: npm ci --registry=https://registry.npmjs.org/
+
+      - name: Validate project
+        run: |
+          npm run lint
+          npm run build
+
+      - name: Commit and publish changes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add \
+            src/components/ui/Signature.tsx \
+            src/components/experience/CarPrototype.tsx \
+            src/app/globals.css
+
+          if git diff --cached --quiet; then
+            echo "The requested changes are already applied."
+            exit 0
+          fi
+
+          git commit -m "Replace MMC branding and add rear signals"
+          git push
