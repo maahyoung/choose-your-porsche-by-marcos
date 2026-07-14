@@ -15,7 +15,8 @@ const LEFT_DOOR_NODE_NAME = "TwiXeR_992_gt3rs_door_L";
 const RIGHT_DOOR_NODE_NAME = "TwiXeR_992_gt3rs_door_R";
 const REAR_WING_NODE_NAMES = [
   "TwiXeR_992_gt3rs_carbon_Wing",
-  "TwiXeR_992_gt3rs_spoiler",
+  "TwiXeR_992_gt3rs_left_leg",
+  "TwiXeR_992_gt3rs_right_leg",
 ] as const;
 const LEFT_DOOR_PART_NAMES = [
   "TwiXeR_992_gt3rs_door_L",
