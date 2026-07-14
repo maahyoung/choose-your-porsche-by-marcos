@@ -12,20 +12,14 @@ import { useConfigurator } from "@/store/configurator";
 const MODEL_URL = "/models/porsche-911-gt3-rs-992.glb";
 const HOOD_NODE_NAME = "TwiXeR_992_gt3rs_carbon_hood";
 const LEFT_DOOR_NODE_NAME = "TwiXeR_992_gt3rs_door_L";
-const LEFT_DOOR_PARTS = [
-  { exact: "TwiXeR_992_gt3rs_door_L", fallback: "gt3rs_door_l" },
-  { exact: "TwiXeR_992_doorglass_L_tint", fallback: "doorglass_l" },
-  { exact: "TwiXeR_992_doorpanel_L_antichrome", fallback: "doorpanel_l" },
-  { exact: "TwiXeR_992_mirror_L", fallback: "mirror_l" },
-  { exact: "TwiXeR_992_door_L_antichrome_end", fallback: "door_l_antichrome_end" },
-  { exact: "TwiXeR_992_door_L_chrome_end", fallback: "door_l_chrome_end" },
-] as const;
-
-const LEFT_DOOR_FIXED_PARTS = [
-  "quarterglass_l",
-  "sideskirts_l",
-  "headlightglass_l",
-] as const;
+const LEFT_DOOR_PART_NAMES = [
+  "TwiXeR_992_gt3rs_door_L",
+  "TwiXeR_992_doorglass_L_tint",
+  "TwiXeR_992_doorpanel_L_antichrome",
+  "TwiXeR_992_mirror_L",
+  "TwiXeR_992_door_L_antichrome_end",
+  "TwiXeR_992_door_L_chrome_end",
+];
 
 type MaterialDefaults = {
   color: THREE.Color;
@@ -76,28 +70,6 @@ function objectHasNamedAncestor(object: THREE.Object3D | null, nodeName: string)
   return false;
 }
 
-function objectHasAncestorMatching(
-  object: THREE.Object3D | null,
-  selectors: readonly { exact: string; fallback: string }[],
-) {
-  let current: THREE.Object3D | null = object;
-
-  while (current) {
-    const currentName = current.name.toLowerCase();
-    if (
-      selectors.some(
-        ({ exact, fallback }) =>
-          current.name === exact || currentName.includes(fallback.toLowerCase()),
-      )
-    ) {
-      return true;
-    }
-    current = current.parent;
-  }
-
-  return false;
-}
-
 function findNamedPart(model: THREE.Object3D, exactName: string, fallback: string) {
   const exact = model.getObjectByName(exactName);
   if (exact) return exact;
@@ -110,49 +82,6 @@ function findNamedPart(model: THREE.Object3D, exactName: string, fallback: strin
   });
 
   return match;
-}
-
-function findNamedParts(
-  model: THREE.Object3D,
-  selectors: readonly { exact: string; fallback: string }[],
-) {
-  const parts: THREE.Object3D[] = [];
-  const seen = new Set<THREE.Object3D>();
-
-  selectors.forEach(({ exact, fallback }) => {
-    const part = findNamedPart(model, exact, fallback);
-    if (part && !seen.has(part)) {
-      seen.add(part);
-      parts.push(part);
-    }
-  });
-
-  return parts;
-}
-
-function findRootLevelNamedParts(
-  model: THREE.Object3D,
-  selectors: readonly { exact: string; fallback: string }[],
-  excludeFallbacks: readonly string[] = [],
-) {
-  const rootNode = model.getObjectByName("RootNode") ?? model;
-  const parts: THREE.Object3D[] = [];
-  const seen = new Set<THREE.Object3D>();
-
-  rootNode.children.forEach((child) => {
-    const childName = child.name.toLowerCase();
-    const included = selectors.some(
-      ({ exact, fallback }) => child.name === exact || childName.includes(fallback.toLowerCase()),
-    );
-    const excluded = excludeFallbacks.some((fallback) => childName.includes(fallback.toLowerCase()));
-
-    if (included && !excluded && !seen.has(child)) {
-      seen.add(child);
-      parts.push(child);
-    }
-  });
-
-  return parts;
 }
 
 export function PorscheGT3RS() {
@@ -236,13 +165,8 @@ export function PorscheGT3RS() {
       hoodPivot.current = pivot;
     }
 
-    const leftDoor = findNamedPart(model, LEFT_DOOR_NODE_NAME, "gt3rs_door_l");
-    const leftDoorParts = findRootLevelNamedParts(
-      model,
-      LEFT_DOOR_PARTS,
-      LEFT_DOOR_FIXED_PARTS,
-    );
-    if (leftDoor && leftDoor.parent && leftDoorParts.length > 0 && !leftDoorPivot.current) {
+    const leftDoor = model.getObjectByName(LEFT_DOOR_NODE_NAME);
+    if (leftDoor && leftDoor.parent && !leftDoorPivot.current) {
       leftDoor.updateWorldMatrix(true, true);
 
       const bounds = new THREE.Box3().setFromObject(leftDoor);
@@ -250,9 +174,6 @@ export function PorscheGT3RS() {
       const pivot = new THREE.Group();
       pivot.name = "left_door_pivot_manual";
 
-      // The front hinge sits near the A-pillar. Use the shell bounds for a
-      // stable pivot, then attach every separate root-level door piece
-      // (outer shell, glass, trim ends, inner panel, mirror) to one pivot.
       const worldPivot = new THREE.Vector3(
         bounds.max.x - 0.012,
         bounds.min.y + (bounds.max.y - bounds.min.y) * 0.5,
@@ -263,8 +184,9 @@ export function PorscheGT3RS() {
       pivot.position.copy(localPivot);
       doorParent.add(pivot);
 
-      leftDoorParts.forEach((part) => {
-        pivot.attach(part);
+      LEFT_DOOR_PART_NAMES.forEach((partName) => {
+        const part = model.getObjectByName(partName);
+        if (part) pivot.attach(part);
       });
 
       pivot.rotation.y = leftDoorOpen ? -1.08 : 0;
@@ -480,9 +402,14 @@ export function PorscheGT3RS() {
       return;
     }
 
-    if (objectHasAncestorMatching(event.object, LEFT_DOOR_PARTS)) {
-      event.stopPropagation();
-      toggleLeftDoorOpen();
+    let current: THREE.Object3D | null = event.object;
+    while (current) {
+      if (LEFT_DOOR_PART_NAMES.includes(current.name)) {
+        event.stopPropagation();
+        toggleLeftDoorOpen();
+        return;
+      }
+      current = current.parent;
     }
   };
 
