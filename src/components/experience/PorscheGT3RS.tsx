@@ -13,7 +13,10 @@ const MODEL_URL = "/models/porsche-911-gt3-rs-992.glb";
 const HOOD_NODE_NAME = "TwiXeR_992_gt3rs_carbon_hood";
 const LEFT_DOOR_NODE_NAME = "TwiXeR_992_gt3rs_door_L";
 const RIGHT_DOOR_NODE_NAME = "TwiXeR_992_gt3rs_door_R";
-const REAR_WING_NODE_NAME = "TwiXeR_992_gt3rs_carbon_Wing";
+const REAR_WING_NODE_NAMES = [
+  "TwiXeR_992_gt3rs_carbon_Wing",
+  "TwiXeR_992_gt3rs_spoiler",
+] as const;
 const LEFT_DOOR_PART_NAMES = [
   "TwiXeR_992_gt3rs_door_L",
   "TwiXeR_992_doorglass_L_tint",
@@ -241,10 +244,12 @@ export function PorscheGT3RS() {
   }, [transitionNonce]);
 
   useEffect(() => {
-    const rearWing = model.getObjectByName(REAR_WING_NODE_NAME);
-    if (rearWing) {
-      rearWing.visible = wingInstalled;
-    }
+    REAR_WING_NODE_NAMES.forEach((nodeName) => {
+      const part = model.getObjectByName(nodeName);
+      if (part) {
+        part.visible = wingInstalled;
+      }
+    });
   }, [model, wingInstalled]);
 
   useEffect(() => {
