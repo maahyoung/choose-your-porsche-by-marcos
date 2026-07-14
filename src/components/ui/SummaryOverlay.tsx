@@ -6,6 +6,13 @@ import { getPaint } from "@/config/paints";
 import { useConfigurator } from "@/store/configurator";
 import { Signature } from "./Signature";
 
+const performanceSpecs = [
+  ["Engine", "4.0L naturally aspirated flat-six"],
+  ["Power", "518 hp"],
+  ["0–60 mph", "3.0 s"],
+  ["Top speed", "184 mph / 296 km/h"],
+];
+
 export function SummaryOverlay() {
   const language = useConfigurator((state) => state.language);
   const summaryMode = useConfigurator((state) => state.summaryMode);
@@ -30,34 +37,30 @@ export function SummaryOverlay() {
 
     const scale = Math.max(1, output.width / 1600);
     const gradient = context.createLinearGradient(0, output.height * 0.56, 0, output.height);
-    gradient.addColorStop(0, "rgba(0,0,0,0)");
-    gradient.addColorStop(1, "rgba(0,0,0,0.78)");
+    gradient.addColorStop(0, "rgba(255,255,255,0)");
+    gradient.addColorStop(1, "rgba(239,242,246,0.94)");
     context.fillStyle = gradient;
     context.fillRect(0, 0, output.width, output.height);
 
-    context.fillStyle = "rgba(255,255,255,0.6)";
+    context.fillStyle = "rgba(17,21,26,0.68)";
     context.font = `${12 * scale}px Arial`;
-    context.letterSpacing = `${3 * scale}px`;
-    context.fillText("CHOOSE YOUR PORSCHE", 52 * scale, output.height - 114 * scale);
+    context.fillText("911 by Marcos", 52 * scale, output.height - 114 * scale);
 
-    context.fillStyle = "#ffffff";
+    context.fillStyle = "#11151a";
     context.font = `600 ${34 * scale}px Arial`;
-    context.letterSpacing = "0px";
     context.fillText("911 GT3 RS", 52 * scale, output.height - 72 * scale);
 
-    context.fillStyle = "rgba(255,255,255,0.66)";
+    context.fillStyle = "rgba(17,21,26,0.66)";
     context.font = `${14 * scale}px Arial`;
-    context.fillText(`${paint.name[language]} · MARCOS911`, 52 * scale, output.height - 42 * scale);
+    context.fillText(`${paint.name[language]} · 518 HP · 0–60 3.0 s`, 52 * scale, output.height - 42 * scale);
 
     context.textAlign = "right";
-    context.fillStyle = "rgba(255,255,255,0.92)";
+    context.fillStyle = "rgba(17,21,26,0.92)";
     context.font = `700 ${17 * scale}px Arial`;
-    context.letterSpacing = `${7 * scale}px`;
     context.fillText("PORSCHE", output.width - 46 * scale, output.height - 70 * scale);
 
-    context.fillStyle = "rgba(255,255,255,0.42)";
+    context.fillStyle = "rgba(17,21,26,0.42)";
     context.font = `${9 * scale}px Arial`;
-    context.letterSpacing = "0px";
     context.fillText(
       "Unofficial personal project · Not affiliated with Porsche AG",
       output.width - 46 * scale,
@@ -87,13 +90,27 @@ export function SummaryOverlay() {
           >
             <p>{t.configured}</p>
             <h2>{t.summaryTitle}</h2>
+
             <div className="summary-specs">
               <span>992 · 911 GT3 RS</span>
-              <span>{paint.name[language]} · MARCOS911</span>
+              <span>{paint.name[language]} · by Marcos</span>
             </div>
+
+            <div className="summary-spec-grid">
+              {performanceSpecs.map(([label, value]) => (
+                <div key={label} className="spec-card">
+                  <small>{label}</small>
+                  <strong>{value}</strong>
+                </div>
+              ))}
+            </div>
+
             <Signature />
-            <small className="summary-disclaimer">Unofficial personal project · Not affiliated with Porsche AG</small>
+            <small className="summary-disclaimer">
+              Unofficial personal project · Not affiliated with Porsche AG
+            </small>
           </motion.div>
+
           <div className="summary-actions">
             <button onClick={() => setSummaryMode(false)}>{t.edit}</button>
             <button onClick={saveImage}>{t.save}</button>

@@ -53,6 +53,8 @@ export function ConfiguratorExperience() {
   return (
     <main className="experience-shell">
       <div className="showroom-backdrop" />
+      <div className="showroom-side-falloff" />
+      <div className="showroom-horizon-band" />
       <div className="showroom-floor-glow" />
 
       <div className="scene-layer">

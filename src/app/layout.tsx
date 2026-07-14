@@ -3,7 +3,7 @@ import "./globals.css";
 import "./showroom-overrides.css";
 
 export const metadata: Metadata = {
-  title: "Choose Your Porsche — by Marcos",
+  title: "911 by Marcos",
   description:
     "An unofficial interactive 911 GT3 RS configurator learning concept by Marcos.",
 };

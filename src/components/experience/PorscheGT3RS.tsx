@@ -158,14 +158,16 @@ export function PorscheGT3RS() {
         standard.emissive.set("#eef7ff");
         standard.emissiveIntensity = headlights
           ? materialName.includes("headlight_high")
-            ? 0.72
-            : 0.34
+            ? 0.26
+            : 0.08
           : 0;
       }
 
       const isFrontSignal =
         objectName.includes("signal_l_bumper") ||
-        objectName.includes("signal_r_bumper");
+        objectName.includes("signal_r_bumper") ||
+        materialName.includes("signal_l_bumper") ||
+        materialName.includes("signal_r_bumper");
 
       if (isFrontSignal) {
         standard.color.set(hazards && hazardOn ? "#ff8a00" : "#2b1a0e");
@@ -177,34 +179,42 @@ export function PorscheGT3RS() {
       }
 
       const isNativeRearSignal =
-        (objectName.includes("signal") || materialName.includes("signal")) &&
+        (objectName.includes("signal") ||
+          materialName.includes("signal") ||
+          materialName.includes("indicator") ||
+          objectName.includes("indicator")) &&
         (objectName.includes("rear") ||
           objectName.includes("tail") ||
           materialName.includes("rear") ||
           materialName.includes("tail"));
 
+      const isTailLight =
+        objectName.includes("taillight") ||
+        objectName.includes("brakelight") ||
+        materialName.includes("taillight") ||
+        materialName.includes("brakelight");
+
       if (isNativeRearSignal) {
-        standard.color.set(hazards && hazardOn ? "#ff7a00" : "#33180a");
+        standard.color.set(hazards && hazardOn ? "#ff7d00" : "#3a1c0a");
         standard.emissive.set("#ff6500");
         standard.emissiveIntensity = hazards && hazardOn ? 1.8 : 0;
         standard.roughness = 0.2;
         standard.metalness = 0;
-      }
+      } else if (isTailLight) {
+        if (hazards && hazardOn) {
+          standard.color.set("#ff7d00");
+          standard.emissive.set("#ff6500");
+          standard.emissiveIntensity = 1.4;
+        } else {
+          standard.color.set(taillights ? "#8f0010" : "#250005");
+          standard.emissive.set("#ff1028");
+          standard.emissiveIntensity = taillights
+            ? objectName.includes("brakelight") || materialName.includes("brakelight")
+              ? 1.15
+              : 0.9
+            : 0.03;
+        }
 
-      const isTailLight =
-        objectName.includes("taillight_running") ||
-        objectName.includes("brakelight") ||
-        materialName.includes("taillight_running") ||
-        materialName.includes("brakelight");
-
-      if (isTailLight && !isNativeRearSignal) {
-        standard.color.set(taillights ? "#8f0010" : "#250005");
-        standard.emissive.set("#ff1028");
-        standard.emissiveIntensity = taillights
-          ? objectName.includes("brakelight") || materialName.includes("brakelight")
-            ? 1.25
-            : 0.95
-          : 0.03;
         standard.roughness = 0.18;
         standard.metalness = 0;
         standard.envMapIntensity = 0.52;
@@ -221,7 +231,7 @@ export function PorscheGT3RS() {
     const elapsed = performance.now() - transitionStart.current;
     const pulse = elapsed < 900 ? Math.sin((elapsed / 900) * Math.PI) : 0;
 
-    group.current.position.x = pulse * 0.42;
+    group.current.position.x = pulse * 0.4;
     group.current.position.y =
       -0.14 + Math.sin(state.clock.elapsedTime * 0.72) * 0.006;
     group.current.rotation.y =
@@ -231,25 +241,6 @@ export function PorscheGT3RS() {
   return (
     <group ref={group} scale={1.1} dispose={null}>
       <primitive object={model} />
-
-      {headlights && (
-        <>
-          <pointLight
-            position={[-0.65, 0.62, 2.3]}
-            intensity={2.3}
-            distance={3.2}
-            decay={2}
-            color="#eaf6ff"
-          />
-          <pointLight
-            position={[0.65, 0.62, 2.3]}
-            intensity={2.3}
-            distance={3.2}
-            decay={2}
-            color="#eaf6ff"
-          />
-        </>
-      )}
     </group>
   );
 }
