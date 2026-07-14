@@ -23,6 +23,7 @@ export function SummaryOverlay() {
   const hoodOpen = useConfigurator((state) => state.hoodOpen);
   const leftDoorOpen = useConfigurator((state) => state.leftDoorOpen);
   const rightDoorOpen = useConfigurator((state) => state.rightDoorOpen);
+  const wingInstalled = useConfigurator((state) => state.wingInstalled);
   const t = copy[language];
   const paint = getPaint(paintId);
   const wheel = getWheelFinishOption(wheelId);
@@ -54,7 +55,7 @@ export function SummaryOverlay() {
 
             <div className="summary-specs">
               <span>992 · 911 GT3 RS</span>
-              <span>{paint.name[language]} · {wheel.name[language]} · {caliper.name[language]} {t.calipers}{hoodOpen ? ` · ${t.frontHood}: ${t.on}` : ""}{leftDoorOpen ? ` · ${t.leftDoor}: ${t.on}` : ""}{rightDoorOpen ? ` · ${t.rightDoor}: ${t.on}` : ""} · by Marcos</span>
+              <span>{paint.name[language]} · {wheel.name[language]} · {caliper.name[language]} {t.calipers}{hoodOpen ? ` · ${t.frontHood}: ${t.on}` : ""}{leftDoorOpen ? ` · ${t.leftDoor}: ${t.on}` : ""}{rightDoorOpen ? ` · ${t.rightDoor}: ${t.on}` : ""}{!wingInstalled ? ` · ${t.rearWing}: ${t.off}` : ""} · by Marcos</span>
             </div>
 
             <div className="summary-spec-grid">

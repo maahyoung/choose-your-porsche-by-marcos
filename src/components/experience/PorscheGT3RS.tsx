@@ -13,6 +13,7 @@ const MODEL_URL = "/models/porsche-911-gt3-rs-992.glb";
 const HOOD_NODE_NAME = "TwiXeR_992_gt3rs_carbon_hood";
 const LEFT_DOOR_NODE_NAME = "TwiXeR_992_gt3rs_door_L";
 const RIGHT_DOOR_NODE_NAME = "TwiXeR_992_gt3rs_door_R";
+const REAR_WING_NODE_NAME = "TwiXeR_992_gt3rs_carbon_Wing";
 const LEFT_DOOR_PART_NAMES = [
   "TwiXeR_992_gt3rs_door_L",
   "TwiXeR_992_doorglass_L_tint",
@@ -112,6 +113,7 @@ export function PorscheGT3RS() {
   const toggleLeftDoorOpen = useConfigurator((state) => state.toggleLeftDoorOpen);
   const rightDoorOpen = useConfigurator((state) => state.rightDoorOpen);
   const toggleRightDoorOpen = useConfigurator((state) => state.toggleRightDoorOpen);
+  const wingInstalled = useConfigurator((state) => state.wingInstalled);
   const headlights = useConfigurator((state) => state.headlights);
   const taillights = useConfigurator((state) => state.taillights);
   const hazards = useConfigurator((state) => state.hazards);
@@ -237,6 +239,13 @@ export function PorscheGT3RS() {
   useEffect(() => {
     transitionStart.current = performance.now();
   }, [transitionNonce]);
+
+  useEffect(() => {
+    const rearWing = model.getObjectByName(REAR_WING_NODE_NAME);
+    if (rearWing) {
+      rearWing.visible = wingInstalled;
+    }
+  }, [model, wingInstalled]);
 
   useEffect(() => {
     if (!hazards) {

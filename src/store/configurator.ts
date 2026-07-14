@@ -25,6 +25,7 @@ type ConfiguratorState = {
   hoodOpen: boolean;
   leftDoorOpen: boolean;
   rightDoorOpen: boolean;
+  wingInstalled: boolean;
   headlights: boolean;
   taillights: boolean;
   hazards: boolean;
@@ -45,6 +46,8 @@ type ConfiguratorState = {
   toggleLeftDoorOpen: () => void;
   setRightDoorOpen: (open: boolean) => void;
   toggleRightDoorOpen: () => void;
+  setWingInstalled: (installed: boolean) => void;
+  toggleWingInstalled: () => void;
   toggleHeadlights: () => void;
   toggleTaillights: () => void;
   toggleHazards: () => void;
@@ -65,6 +68,7 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
   hoodOpen: false,
   leftDoorOpen: false,
   rightDoorOpen: false,
+  wingInstalled: true,
   headlights: false,
   taillights: true,
   hazards: false,
@@ -89,6 +93,9 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
   setRightDoorOpen: (rightDoorOpen) => set({ rightDoorOpen }),
   toggleRightDoorOpen: () =>
     set((state) => ({ rightDoorOpen: !state.rightDoorOpen })),
+  setWingInstalled: (wingInstalled) => set({ wingInstalled }),
+  toggleWingInstalled: () =>
+    set((state) => ({ wingInstalled: !state.wingInstalled })),
   toggleHeadlights: () => set((state) => ({ headlights: !state.headlights })),
   toggleTaillights: () => set((state) => ({ taillights: !state.taillights })),
   toggleHazards: () => set((state) => ({ hazards: !state.hazards })),

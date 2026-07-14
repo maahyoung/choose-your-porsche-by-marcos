@@ -28,6 +28,7 @@ export function ConfiguratorExperience() {
   const setHoodOpen = useConfigurator((state) => state.setHoodOpen);
   const setLeftDoorOpen = useConfigurator((state) => state.setLeftDoorOpen);
   const setRightDoorOpen = useConfigurator((state) => state.setRightDoorOpen);
+  const setWingInstalled = useConfigurator((state) => state.setWingInstalled);
   const toggleHeadlights = useConfigurator((state) => state.toggleHeadlights);
   const toggleTaillights = useConfigurator((state) => state.toggleTaillights);
   const toggleHazards = useConfigurator((state) => state.toggleHazards);
@@ -92,11 +93,19 @@ export function ConfiguratorExperience() {
     } else if (doorR === "0") {
       setRightDoorOpen(false);
     }
+
+    const wing = params.get("wing");
+    if (wing === "1") {
+      setWingInstalled(true);
+    } else if (wing === "0") {
+      setWingInstalled(false);
+    }
   }, [
     setCaliperId,
     setHoodOpen,
     setLeftDoorOpen,
     setRightDoorOpen,
+    setWingInstalled,
     setPaintId,
     setWheelId,
     toggleHazards,
