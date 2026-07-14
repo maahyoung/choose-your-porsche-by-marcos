@@ -149,6 +149,8 @@ export function CarPrototype() {
       <LightLens position={[-1.75, 0.34, 0.44]} scale={[0.12, 0.07, 0.3]} color="#ff101c" active={taillights} />
       <LightLens position={[1.6, 0.26, -0.58]} scale={[0.09, 0.055, 0.12]} color="#ff8a00" active={hazards && hazardOn} />
       <LightLens position={[1.6, 0.26, 0.58]} scale={[0.09, 0.055, 0.12]} color="#ff8a00" active={hazards && hazardOn} />
+      <LightLens position={[-1.77, 0.26, -0.58]} scale={[0.09, 0.055, 0.12]} color="#ff8a00" active={hazards && hazardOn} />
+      <LightLens position={[-1.77, 0.26, 0.58]} scale={[0.09, 0.055, 0.12]} color="#ff8a00" active={hazards && hazardOn} />
 
       <mesh position={[1.76, 0.13, 0]} rotation={[0, Math.PI / 2, 0]}>
         <planeGeometry args={[0.62, 0.18]} />
