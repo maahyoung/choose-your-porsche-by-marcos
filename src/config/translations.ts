@@ -2,7 +2,7 @@ export type Language = "en" | "pt";
 
 export const copy = {
   en: {
-    title: "Choose Your Porsche",
+    title: "Build your own 911",
     by: "by Marcos",
     tagline: "Build the one you imagine.",
     enterSound: "Enter with sound",
@@ -54,7 +54,7 @@ export const copy = {
     placeholder: "3D development vehicle — final licensed model pending",
   },
   pt: {
-    title: "Escolha seu Porsche",
+    title: "Monte seu próprio 911",
     by: "por Marcos",
     tagline: "Construa o que você imagina.",
     enterSound: "Entrar com som",

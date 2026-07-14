@@ -183,7 +183,6 @@ export function ConfiguratorPanel() {
               else if (summaryMode) setSummaryMode(false);
             }}
           >
-            <span>{String(index + 1).padStart(2, "0")}</span>
             <strong>{t[step]}</strong>
           </button>
         ))}
