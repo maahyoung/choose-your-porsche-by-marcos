@@ -1,0 +1,17 @@
+Choose Your Porsche by Marcos — v27.1
+
+Hotfix release based on the last stable cockpit camera implementation.
+
+Changes:
+- Removed the hazards/turn-signal option from UI, state, URL sharing, prototype and GT3 RS material logic.
+- Removed all added mirror and rear indicator overlays.
+- Preserved the improved headlight emitters, beams and glow without indicator effects.
+- Restored the stable cockpit camera position and added limited drag-to-look yaw/pitch on top of it.
+- Kept tap-vs-drag protection so doors and hood do not open during vehicle rotation.
+- Added a stacked portrait layout: vehicle on top, configurator panel below.
+- Centered the vehicle in portrait layouts while keeping the desktop composition unchanged.
+- Resized the mobile intro 911 title and controls to prevent horizontal overflow.
+
+Archive contract:
+- ZIP filename: choose-your-porsche-by-marcos-phase-01.zip
+- Root folder: choose-your-porsche-by-marcos/

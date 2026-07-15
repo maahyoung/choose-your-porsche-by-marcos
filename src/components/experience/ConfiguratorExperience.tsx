@@ -45,7 +45,6 @@ export function ConfiguratorExperience() {
   const setWingInstalled = useConfigurator((state) => state.setWingInstalled);
   const setHeadlights = useConfigurator((state) => state.setHeadlights);
   const setTaillights = useConfigurator((state) => state.setTaillights);
-  const setHazards = useConfigurator((state) => state.setHazards);
   const t = copy[language];
 
   useEffect(() => {
@@ -91,7 +90,6 @@ export function ConfiguratorExperience() {
     const wing = params.get("wing");
     const lights = params.get("lights");
     const tails = params.get("tails");
-    const hazards = params.get("hazards");
 
     if (hood === "1" || hood === "0") setHoodOpen(hood === "1");
     if (doorL === "1" || doorL === "0") setLeftDoorOpen(doorL === "1");
@@ -99,13 +97,11 @@ export function ConfiguratorExperience() {
     if (wing === "1" || wing === "0") setWingInstalled(wing === "1");
     if (lights === "1" || lights === "0") setHeadlights(lights === "1");
     if (tails === "1" || tails === "0") setTaillights(tails === "1");
-    if (hazards === "1" || hazards === "0") setHazards(hazards === "1");
   }, [
     setCaliperId,
     setCameraPresetId,
     setEnvironmentId,
     setExhaustFinishId,
-    setHazards,
     setHeadlights,
     setHoodOpen,
     setLeftDoorOpen,

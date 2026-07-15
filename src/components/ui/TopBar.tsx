@@ -57,7 +57,6 @@ export function TopBar() {
   const wingInstalled = useConfigurator((state) => state.wingInstalled);
   const headlights = useConfigurator((state) => state.headlights);
   const taillights = useConfigurator((state) => state.taillights);
-  const hazards = useConfigurator((state) => state.hazards);
   const setQuality = useConfigurator((state) => state.setQuality);
 
   const [copied, setCopied] = useState(false);
@@ -85,7 +84,6 @@ export function TopBar() {
     buildUrl.searchParams.set("wing", wingInstalled ? "1" : "0");
     buildUrl.searchParams.set("lights", headlights ? "1" : "0");
     buildUrl.searchParams.set("tails", taillights ? "1" : "0");
-    buildUrl.searchParams.set("hazards", hazards ? "1" : "0");
     const url = buildUrl.toString();
 
     try {

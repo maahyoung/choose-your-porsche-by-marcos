@@ -38,7 +38,6 @@ type ConfiguratorState = {
   wingInstalled: boolean;
   headlights: boolean;
   taillights: boolean;
-  hazards: boolean;
   summaryMode: boolean;
   transitionNonce: number;
   cameraTransitionNonce: number;
@@ -66,8 +65,6 @@ type ConfiguratorState = {
   toggleHeadlights: () => void;
   setTaillights: (enabled: boolean) => void;
   toggleTaillights: () => void;
-  setHazards: (enabled: boolean) => void;
-  toggleHazards: () => void;
   setSummaryMode: (enabled: boolean) => void;
   replayTransition: () => void;
 };
@@ -95,7 +92,6 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
   wingInstalled: true,
   headlights: true,
   taillights: true,
-  hazards: false,
   summaryMode: false,
   transitionNonce: 0,
   cameraTransitionNonce: 0,
@@ -154,8 +150,6 @@ export const useConfigurator = create<ConfiguratorState>((set) => ({
   toggleHeadlights: () => set((state) => ({ headlights: !state.headlights })),
   setTaillights: (taillights) => set({ taillights }),
   toggleTaillights: () => set((state) => ({ taillights: !state.taillights })),
-  setHazards: (hazards) => set({ hazards }),
-  toggleHazards: () => set((state) => ({ hazards: !state.hazards })),
   setSummaryMode: (summaryMode) => set({ summaryMode }),
   replayTransition: () =>
     set((state) => ({

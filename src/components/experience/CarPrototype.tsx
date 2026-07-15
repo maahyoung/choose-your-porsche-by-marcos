@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { getPaint } from "@/config/paints";
@@ -54,21 +54,13 @@ export function CarPrototype() {
   const paintId = useConfigurator((state) => state.paintId);
   const headlights = useConfigurator((state) => state.headlights);
   const taillights = useConfigurator((state) => state.taillights);
-  const hazards = useConfigurator((state) => state.hazards);
   const transitionNonce = useConfigurator((state) => state.transitionNonce);
-  const [hazardOn, setHazardOn] = useState(true);
   const paint = useMemo(() => getPaint(paintId), [paintId]);
   const transitionStart = useRef(0);
 
   useEffect(() => {
     transitionStart.current = performance.now();
   }, [transitionNonce]);
-
-  useEffect(() => {
-    if (!hazards) return;
-    const interval = window.setInterval(() => setHazardOn((value) => !value), 520);
-    return () => window.clearInterval(interval);
-  }, [hazards]);
 
   useFrame((state) => {
     if (!group.current) return;
@@ -147,10 +139,6 @@ export function CarPrototype() {
       <LightLens position={[1.58, 0.38, 0.43]} scale={[0.16, 0.1, 0.28]} color="#eef8ff" active={headlights} />
       <LightLens position={[-1.75, 0.34, -0.44]} scale={[0.12, 0.07, 0.3]} color="#ff101c" active={taillights} />
       <LightLens position={[-1.75, 0.34, 0.44]} scale={[0.12, 0.07, 0.3]} color="#ff101c" active={taillights} />
-      <LightLens position={[1.6, 0.26, -0.58]} scale={[0.09, 0.055, 0.12]} color="#ff8a00" active={hazards && hazardOn} />
-      <LightLens position={[1.6, 0.26, 0.58]} scale={[0.09, 0.055, 0.12]} color="#ff8a00" active={hazards && hazardOn} />
-      <LightLens position={[-1.77, 0.26, -0.58]} scale={[0.09, 0.055, 0.12]} color="#ff8a00" active={hazards && hazardOn} />
-      <LightLens position={[-1.77, 0.26, 0.58]} scale={[0.09, 0.055, 0.12]} color="#ff8a00" active={hazards && hazardOn} />
 
       <mesh position={[1.76, 0.13, 0]} rotation={[0, Math.PI / 2, 0]}>
         <planeGeometry args={[0.62, 0.18]} />

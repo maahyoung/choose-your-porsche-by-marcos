@@ -23,28 +23,7 @@ import { PorscheGT3RS } from "./PorscheGT3RS";
 import type { CameraPresetId, EnvironmentId } from "@/config/details";
 import { useConfigurator } from "@/store/configurator";
 
-type ViewportKind =
-  | "phone-portrait"
-  | "phone-landscape"
-  | "tablet-portrait"
-  | "compact-landscape"
-  | "desktop"
-  | "ultrawide";
-
-type ViewportProfile = {
-  width: number;
-  height: number;
-  aspect: number;
-  kind: ViewportKind;
-};
-
-type SceneLayout = {
-  sceneOffsetX: number;
-  distanceScale: number;
-  fovBoost: number;
-  targetY: number;
-  platformScale: number;
-};
+const SCENE_OFFSET_X = -1.52;
 
 type CameraView = {
   position: [number, number, number];
@@ -52,118 +31,44 @@ type CameraView = {
   fov: number;
 };
 
-const DEFAULT_PROFILE: ViewportProfile = {
-  width: 1440,
-  height: 900,
-  aspect: 1.6,
-  kind: "desktop",
+const CAMERA_VIEWS: Record<CameraPresetId, CameraView> = {
+  "three-quarter": {
+    position: [4.8, 2.06, 5.7],
+    target: [SCENE_OFFSET_X, 0.54, 0],
+    fov: 31,
+  },
+  front: {
+    position: [SCENE_OFFSET_X, 1.38, 6.85],
+    target: [SCENE_OFFSET_X, 0.58, 0.48],
+    fov: 32,
+  },
+  rear: {
+    position: [SCENE_OFFSET_X, 1.42, -6.95],
+    target: [SCENE_OFFSET_X, 0.58, -0.52],
+    fov: 32,
+  },
+  side: {
+    position: [5.05, 1.45, -0.08],
+    target: [SCENE_OFFSET_X, 0.56, -0.02],
+    fov: 31,
+  },
+  cockpit: {
+    position: [SCENE_OFFSET_X + 0.38, 0.94, -0.12],
+    target: [SCENE_OFFSET_X + 0.25, 0.8, 2.35],
+    fov: 50,
+  },
 };
 
-function getViewportKind(width: number, height: number): ViewportKind {
-  const aspect = width / Math.max(height, 1);
 
-  if (width <= 620 && aspect < 1) return "phone-portrait";
-  if (height <= 560 && aspect >= 1.2) return "phone-landscape";
-  if (aspect < 1 && width <= 1024) return "tablet-portrait";
-  if (width < 1180 || height < 720) return "compact-landscape";
-  if (aspect >= 2.05) return "ultrawide";
-  return "desktop";
-}
+function getCameraView(cameraPresetId: CameraPresetId, sceneOffsetX: number): CameraView {
+  const base = CAMERA_VIEWS[cameraPresetId];
+  const deltaX = sceneOffsetX - SCENE_OFFSET_X;
 
-function getSceneLayout(profile: ViewportProfile): SceneLayout {
-  switch (profile.kind) {
-    case "phone-portrait":
-      return {
-        sceneOffsetX: 0,
-        distanceScale: 1.22,
-        fovBoost: 4,
-        targetY: 0.36,
-        platformScale: 0.8,
-      };
-    case "tablet-portrait":
-      return {
-        sceneOffsetX: 0,
-        distanceScale: 1.12,
-        fovBoost: 2.5,
-        targetY: 0.4,
-        platformScale: 0.9,
-      };
-    case "phone-landscape":
-      return {
-        sceneOffsetX: -0.58,
-        distanceScale: 1.14,
-        fovBoost: 2,
-        targetY: 0.48,
-        platformScale: 0.88,
-      };
-    case "compact-landscape":
-      return {
-        sceneOffsetX: -0.92,
-        distanceScale: 1.08,
-        fovBoost: 1,
-        targetY: 0.5,
-        platformScale: 0.94,
-      };
-    case "ultrawide":
-      return {
-        sceneOffsetX: -1.82,
-        distanceScale: 0.96,
-        fovBoost: -0.5,
-        targetY: 0.54,
-        platformScale: 1.06,
-      };
-    default:
-      return {
-        sceneOffsetX: -1.52,
-        distanceScale: 1,
-        fovBoost: 0,
-        targetY: 0.54,
-        platformScale: 1,
-      };
-  }
-}
-
-function getCameraView(cameraPresetId: CameraPresetId, layout: SceneLayout): CameraView {
-  const x = layout.sceneOffsetX;
-  const scale = layout.distanceScale;
-  const heightLift = Math.max(0, scale - 1) * 0.7;
-
-  switch (cameraPresetId) {
-    case "front":
-      return {
-        position: [x, 1.38 + heightLift, 6.85 * scale],
-        target: [x, layout.targetY + 0.04, 0.48],
-        fov: 32 + layout.fovBoost,
-      };
-    case "rear":
-      return {
-        position: [x, 1.42 + heightLift, -6.95 * scale],
-        target: [x, layout.targetY + 0.04, -0.52],
-        fov: 32 + layout.fovBoost,
-      };
-    case "side":
-      return {
-        position: [x + 6.57 * scale, 1.45 + heightLift, -0.08],
-        target: [x, layout.targetY + 0.02, -0.02],
-        fov: 31 + layout.fovBoost,
-      };
-    case "cockpit":
-      return {
-        position: [x + 0.38, 0.94, -0.12],
-        target: [x + 0.25, 0.8, 2.35],
-        fov: profileCockpitFov(layout),
-      };
-    default:
-      return {
-        position: [x + 6.32 * scale, 2.06 + heightLift, 5.7 * scale],
-        target: [x, layout.targetY, 0],
-        fov: 31 + layout.fovBoost,
-      };
-  }
-}
-
-function profileCockpitFov(layout: SceneLayout) {
-  return layout.sceneOffsetX === 0 ? 54 : 50;
+  return {
+    position: [base.position[0] + deltaX, base.position[1], base.position[2]],
+    target: [base.target[0] + deltaX, base.target[1], base.target[2]],
+    fov: base.fov,
+  };
 }
 
 const ENVIRONMENT_STYLE: Record<
@@ -231,7 +136,7 @@ const ENVIRONMENT_STYLE: Record<
   },
 };
 
-function CameraRig({ layout }: { layout: SceneLayout }) {
+function CameraRig({ sceneOffsetX }: { sceneOffsetX: number }) {
   const summaryMode = useConfigurator((state) => state.summaryMode);
   const cameraPresetId = useConfigurator((state) => state.cameraPresetId);
   const cameraTransitionNonce = useConfigurator(
@@ -243,27 +148,28 @@ function CameraRig({ layout }: { layout: SceneLayout }) {
   const progress = useRef(1);
   const startPosition = useRef(new THREE.Vector3());
   const endPosition = useRef(new THREE.Vector3());
-  const startTarget = useRef(new THREE.Vector3(layout.sceneOffsetX, layout.targetY, 0));
-  const endTarget = useRef(new THREE.Vector3(layout.sceneOffsetX, layout.targetY, 0));
+  const startTarget = useRef(new THREE.Vector3(sceneOffsetX, 0.54, 0));
+  const endTarget = useRef(new THREE.Vector3(sceneOffsetX, 0.54, 0));
   const startFov = useRef(31);
   const endFov = useRef(31);
-  const summaryTarget = useRef(new THREE.Vector3(layout.sceneOffsetX, layout.targetY, 0));
+  const summaryTarget = useRef(new THREE.Vector3(sceneOffsetX, 0.54, 0));
   const cockpitYawTarget = useRef(0);
   const cockpitPitchTarget = useRef(0);
   const cockpitYaw = useRef(0);
   const cockpitPitch = useRef(0);
-  const cockpitDirection = useRef(new THREE.Vector3(0, 0, 1));
+  const cockpitDirection = useRef(new THREE.Vector3());
+  const cockpitRight = useRef(new THREE.Vector3());
   const cockpitLookTarget = useRef(new THREE.Vector3());
-  const cockpitEuler = useRef(new THREE.Euler(0, 0, 0, "YXZ"));
+  const worldUp = useRef(new THREE.Vector3(0, 1, 0));
 
   useEffect(() => {
     if (summaryMode) return;
 
-    const view = getCameraView(cameraPresetId, layout);
+    const view = getCameraView(cameraPresetId, sceneOffsetX);
     startPosition.current.copy(camera.position);
     endPosition.current.set(...view.position);
     startTarget.current.copy(
-      controls.current?.target ?? new THREE.Vector3(layout.sceneOffsetX, layout.targetY, 0),
+      controls.current?.target ?? new THREE.Vector3(sceneOffsetX, 0.54, 0),
     );
     endTarget.current.set(...view.target);
     startFov.current = camera.fov;
@@ -275,50 +181,50 @@ function CameraRig({ layout }: { layout: SceneLayout }) {
       cockpitPitchTarget.current = 0;
       cockpitYaw.current = 0;
       cockpitPitch.current = 0;
-      cockpitLookTarget.current.set(...view.target);
     }
-  }, [camera, cameraPresetId, cameraTransitionNonce, layout, summaryMode]);
+  }, [camera, cameraPresetId, cameraTransitionNonce, sceneOffsetX, summaryMode]);
 
   useEffect(() => {
     const canvas = gl.domElement;
-    let activePointerId: number | null = null;
+    let pointerId: number | null = null;
     let lastX = 0;
     let lastY = 0;
 
     const onPointerDown = (event: PointerEvent) => {
       if (cameraPresetId !== "cockpit" || summaryMode) return;
-      activePointerId = event.pointerId;
+      pointerId = event.pointerId;
       lastX = event.clientX;
       lastY = event.clientY;
-      canvas.style.cursor = "grabbing";
       canvas.setPointerCapture?.(event.pointerId);
+      canvas.style.cursor = "grabbing";
     };
 
     const onPointerMove = (event: PointerEvent) => {
-      if (activePointerId !== event.pointerId || cameraPresetId !== "cockpit") return;
+      if (pointerId !== event.pointerId || cameraPresetId !== "cockpit") return;
       const dx = event.clientX - lastX;
       const dy = event.clientY - lastY;
       lastX = event.clientX;
       lastY = event.clientY;
+
       cockpitYawTarget.current = THREE.MathUtils.clamp(
-        cockpitYawTarget.current - dx * 0.0062,
-        -0.95,
-        0.95,
+        cockpitYawTarget.current - dx * 0.0048,
+        -0.78,
+        0.78,
       );
       cockpitPitchTarget.current = THREE.MathUtils.clamp(
-        cockpitPitchTarget.current - dy * 0.0048,
-        -0.28,
-        0.32,
+        cockpitPitchTarget.current - dy * 0.0038,
+        -0.2,
+        0.22,
       );
     };
 
     const endPointer = (event: PointerEvent) => {
-      if (activePointerId !== event.pointerId) return;
-      activePointerId = null;
-      canvas.style.cursor = cameraPresetId === "cockpit" ? "grab" : "default";
+      if (pointerId !== event.pointerId) return;
+      pointerId = null;
       if (canvas.hasPointerCapture?.(event.pointerId)) {
         canvas.releasePointerCapture(event.pointerId);
       }
+      canvas.style.cursor = cameraPresetId === "cockpit" ? "grab" : "default";
     };
 
     canvas.style.cursor = cameraPresetId === "cockpit" ? "grab" : "default";
@@ -340,14 +246,14 @@ function CameraRig({ layout }: { layout: SceneLayout }) {
     if (summaryMode) {
       const time = state.clock.elapsedTime * 0.18;
       const desired = new THREE.Vector3(
-        layout.sceneOffsetX + Math.sin(time) * 4.95,
+        sceneOffsetX + Math.sin(time) * 4.95,
         1.72 + Math.sin(time * 1.6) * 0.2,
         Math.cos(time) * 5.5,
       );
 
       camera.position.lerp(desired, 1 - Math.pow(0.002, delta));
       summaryTarget.current.set(
-        layout.sceneOffsetX,
+        sceneOffsetX,
         0.5 + Math.sin(time * 0.7) * 0.035,
         0,
       );
@@ -363,7 +269,11 @@ function CameraRig({ layout }: { layout: SceneLayout }) {
       camera.updateProjectionMatrix();
 
       if (controls.current) {
-        controls.current.target.lerpVectors(startTarget.current, endTarget.current, t);
+        controls.current.target.lerpVectors(
+          startTarget.current,
+          endTarget.current,
+          t,
+        );
         controls.current.update();
       } else {
         camera.lookAt(endTarget.current);
@@ -384,16 +294,21 @@ function CameraRig({ layout }: { layout: SceneLayout }) {
         8,
         delta,
       );
-      cockpitEuler.current.set(
-        cockpitPitch.current,
-        cockpitYaw.current,
-        0,
-        "YXZ",
-      );
+
       cockpitDirection.current
-        .set(0, -0.035, 1)
-        .applyEuler(cockpitEuler.current)
+        .copy(endTarget.current)
+        .sub(camera.position)
+        .normalize()
+        .applyAxisAngle(worldUp.current, cockpitYaw.current);
+
+      cockpitRight.current
+        .crossVectors(cockpitDirection.current, worldUp.current)
         .normalize();
+
+      cockpitDirection.current
+        .applyAxisAngle(cockpitRight.current, cockpitPitch.current)
+        .normalize();
+
       cockpitLookTarget.current
         .copy(camera.position)
         .addScaledVector(cockpitDirection.current, 4);
@@ -406,11 +321,11 @@ function CameraRig({ layout }: { layout: SceneLayout }) {
       ref={controls}
       enabled={!summaryMode && cameraPresetId !== "cockpit"}
       enablePan={false}
-      minDistance={4.4 * layout.distanceScale}
-      maxDistance={7.9 * layout.distanceScale}
-      minPolarAngle={Math.PI / 3.75}
-      maxPolarAngle={Math.PI / 2.08}
-      target={[layout.sceneOffsetX, layout.targetY, 0]}
+      minDistance={cameraPresetId === "cockpit" ? 0.35 : 4.4}
+      maxDistance={cameraPresetId === "cockpit" ? 5.2 : 7.9}
+      minPolarAngle={cameraPresetId === "cockpit" ? Math.PI / 4.2 : Math.PI / 3.75}
+      maxPolarAngle={cameraPresetId === "cockpit" ? Math.PI / 1.6 : Math.PI / 2.08}
+      target={[sceneOffsetX, 0.54, 0]}
       dampingFactor={0.05}
       enableDamping
     />
@@ -489,20 +404,17 @@ function StudioEnvironment({
 function DisplayPlatform({
   quality,
   environmentId,
-  layout,
+  sceneOffsetX,
 }: {
   quality: "performance" | "balanced" | "ultra";
   environmentId: EnvironmentId;
-  layout: SceneLayout;
+  sceneOffsetX: number;
 }) {
   const dark = environmentId !== "showroom";
   const night = environmentId === "night";
 
   return (
-    <group
-      position={[layout.sceneOffsetX, -0.3, 0]}
-      scale={[layout.platformScale, 1, layout.platformScale]}
-    >
+    <group position={[sceneOffsetX, -0.3, 0]}>
       <mesh position={[0, -0.16, 0]} receiveShadow castShadow>
         <cylinderGeometry args={[4.86, 4.94, 0.24, 96]} />
         <meshStandardMaterial
@@ -516,7 +428,9 @@ function DisplayPlatform({
       <mesh receiveShadow>
         <cylinderGeometry args={[4.78, 4.82, 0.115, 96]} />
         <MeshReflectorMaterial
-          resolution={quality === "performance" ? 256 : quality === "ultra" ? 1024 : 512}
+          resolution={
+            quality === "performance" ? 256 : quality === "ultra" ? 1024 : 512
+          }
           blur={quality === "performance" ? [120, 34] : [280, 68]}
           mixBlur={0.9}
           mixStrength={dark ? 0.58 : quality === "performance" ? 0.28 : 0.46}
@@ -553,12 +467,11 @@ function DisplayPlatform({
   );
 }
 
-function SceneContent({ profile }: { profile: ViewportProfile }) {
+function SceneContent({ sceneOffsetX }: { sceneOffsetX: number }) {
   const quality = useConfigurator((state) => state.quality);
   const environmentId = useConfigurator((state) => state.environmentId);
   const style = ENVIRONMENT_STYLE[environmentId];
-  const layout = useMemo(() => getSceneLayout(profile), [profile]);
-  const initialView = getCameraView("three-quarter", layout);
+  const initialView = getCameraView("three-quarter", sceneOffsetX);
 
   return (
     <>
@@ -580,7 +493,9 @@ function SceneContent({ profile }: { profile: ViewportProfile }) {
       <StudioEnvironment quality={quality} environmentId={environmentId} />
 
       <ambientLight intensity={style.ambient} />
-      <hemisphereLight args={["#ffffff", style.hemisphereGround, style.hemisphere]} />
+      <hemisphereLight
+        args={["#ffffff", style.hemisphereGround, style.hemisphere]}
+      />
 
       <spotLight
         position={[6.0, 8.8, 6.5]}
@@ -617,66 +532,64 @@ function SceneContent({ profile }: { profile: ViewportProfile }) {
         color={environmentId === "night" ? "#4d91dc" : "#eef7ff"}
       />
 
-      <DisplayPlatform quality={quality} environmentId={environmentId} layout={layout} />
+      <DisplayPlatform
+        quality={quality}
+        environmentId={environmentId}
+        sceneOffsetX={sceneOffsetX}
+      />
 
-      <group position={[layout.sceneOffsetX, 0, 0]}>
+      <group position={[sceneOffsetX, 0, 0]}>
         <PorscheGT3RS />
       </group>
 
       <ContactShadows
-        position={[layout.sceneOffsetX, 0.25, 0]}
+        position={[sceneOffsetX, 0.25, 0]}
         opacity={environmentId === "showroom" ? 0.38 : 0.5}
-        scale={8.9 * layout.platformScale}
+        scale={8.9}
         blur={3.2}
         far={4.8}
         color={environmentId === "night" ? "#020711" : "#4f5660"}
       />
 
-      <CameraRig layout={layout} />
+      <CameraRig sceneOffsetX={sceneOffsetX} />
     </>
   );
-}
-
-function useViewportProfile() {
-  const [profile, setProfile] = useState<ViewportProfile>(DEFAULT_PROFILE);
-
-  useEffect(() => {
-    const update = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      const aspect = width / Math.max(height, 1);
-      const kind = getViewportKind(width, height);
-      const next = { width, height, aspect, kind };
-      setProfile(next);
-      document.documentElement.dataset.screen = kind;
-      document.documentElement.dataset.aspect = aspect >= 2.05 ? "ultrawide" : aspect < 1 ? "portrait" : "standard";
-      document.documentElement.style.setProperty("--app-height", `${height}px`);
-      document.documentElement.style.setProperty("--app-width", `${width}px`);
-    };
-
-    update();
-    window.addEventListener("resize", update, { passive: true });
-    window.addEventListener("orientationchange", update);
-    return () => {
-      window.removeEventListener("resize", update);
-      window.removeEventListener("orientationchange", update);
-    };
-  }, []);
-
-  return profile;
 }
 
 export function CarScene() {
   const quality = useConfigurator((state) => state.quality);
   const environmentId = useConfigurator((state) => state.environmentId);
-  const profile = useViewportProfile();
-  const phoneLike = profile.kind === "phone-portrait" || profile.kind === "phone-landscape";
-  const dpr: [number, number] =
+  const [mobilePortrait, setMobilePortrait] = useState(false);
+  const sceneOffsetX = mobilePortrait ? 0 : SCENE_OFFSET_X;
+  const dpr =
     quality === "performance"
-      ? [1, phoneLike ? 1.05 : 1.15]
+      ? [1, 1.15]
       : quality === "ultra"
-        ? [1, phoneLike ? 1.5 : 2]
-        : [1, phoneLike ? 1.32 : 1.55];
+        ? [1, 2]
+        : [1, 1.55];
+
+  useEffect(() => {
+    const updateViewport = () => {
+      const mobile =
+        window.innerWidth <= 820 && window.innerHeight > window.innerWidth;
+      setMobilePortrait(mobile);
+      document.documentElement.dataset.mobileLayout = mobile
+        ? "stacked"
+        : "overlay";
+      document.documentElement.style.setProperty(
+        "--app-height",
+        `${window.innerHeight}px`,
+      );
+    };
+
+    updateViewport();
+    window.addEventListener("resize", updateViewport, { passive: true });
+    window.addEventListener("orientationchange", updateViewport);
+    return () => {
+      window.removeEventListener("resize", updateViewport);
+      window.removeEventListener("orientationchange", updateViewport);
+    };
+  }, []);
 
   useEffect(() => {
     document.documentElement.dataset.quality = quality;
@@ -697,8 +610,8 @@ export function CarScene() {
 
   return (
     <Canvas
-      shadows={quality !== "performance" && !phoneLike}
-      dpr={dpr}
+      shadows={quality !== "performance" && !mobilePortrait}
+      dpr={dpr as [number, number]}
       gl={glSettings}
       onCreated={({ gl }) => {
         gl.setClearColor(0xffffff, 0);
@@ -708,7 +621,7 @@ export function CarScene() {
       className="car-canvas"
     >
       <Suspense fallback={null}>
-        <SceneContent profile={profile} />
+        <SceneContent sceneOffsetX={sceneOffsetX} />
       </Suspense>
     </Canvas>
   );

@@ -1827,34 +1827,31 @@ html[data-environment="night"] .showroom-floor-glow {
 }
 /* V25 END */
 
-/* V27 — interaction, adaptive viewport and lighting refinement */
-.experience-shell {
-  height: var(--app-height, 100svh);
-}
-
+/* V27.1 — stable cockpit, clean lighting and stacked mobile layout */
 .cockpit-look-hint {
   position: absolute;
-  z-index: 18;
+  z-index: 32;
   left: 50%;
-  top: 96px;
+  top: 94px;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 9px;
+  max-width: calc(100vw - 32px);
   padding: 9px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.65);
   border-radius: 999px;
-  color: rgba(18, 22, 27, 0.78);
-  background: rgba(255, 255, 255, 0.62);
-  box-shadow: 0 10px 30px rgba(33, 42, 52, 0.08);
+  color: rgba(18, 22, 27, 0.76);
+  background: rgba(255, 255, 255, 0.66);
+  box-shadow: 0 10px 28px rgba(33, 42, 52, 0.08);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
-  font-size: 0.64rem;
+  font-size: 0.62rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: nowrap;
   pointer-events: none;
-  animation: v27HintIn 0.45s ease both;
 }
 
 .cockpit-look-hint span {
@@ -1862,96 +1859,236 @@ html[data-environment="night"] .showroom-floor-glow {
   line-height: 1;
 }
 
-@keyframes v27HintIn {
-  from { opacity: 0; transform: translate(-50%, -8px); }
-  to { opacity: 1; transform: translate(-50%, 0); }
-}
+@media (max-width: 820px) and (orientation: portrait) {
+  :root {
+    --mobile-topbar-height: 64px;
+    --mobile-scene-height: 43svh;
+  }
 
-html[data-screen="phone-portrait"] .top-bar,
-html[data-screen="tablet-portrait"] .top-bar {
-  min-height: 64px;
-  padding-top: max(12px, env(safe-area-inset-top));
-  padding-bottom: 10px;
-}
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
 
-html[data-screen="phone-portrait"] .configurator-panel {
-  max-height: min(58svh, 520px) !important;
-}
+  .experience-shell {
+    width: 100vw;
+    height: var(--app-height, 100svh);
+    min-height: 0;
+    overflow: hidden;
+  }
 
-html[data-screen="tablet-portrait"] .configurator-panel {
-  max-height: min(54svh, 600px) !important;
-}
+  .top-bar {
+    position: absolute;
+    inset: 0 0 auto;
+    min-height: var(--mobile-topbar-height);
+    padding: 10px 14px;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+  }
 
-html[data-screen="phone-portrait"] .cockpit-look-hint,
-html[data-screen="tablet-portrait"] .cockpit-look-hint {
-  top: max(74px, calc(env(safe-area-inset-top) + 62px));
-  max-width: calc(100vw - 28px);
-  padding: 8px 12px;
-  font-size: 0.56rem;
-  white-space: nowrap;
-}
+  .hero-left-lockup {
+    min-width: 0;
+  }
 
-html[data-screen="phone-landscape"] .top-bar,
-html[data-screen="compact-landscape"] .top-bar {
-  min-height: 62px;
-  padding-block: 10px;
-}
+  .hero-left-lockup .porsche-crest,
+  .center-wordmark {
+    display: none;
+  }
 
-html[data-screen="phone-landscape"] .configurator-panel {
-  top: 72px !important;
-  right: 10px !important;
-  bottom: 10px !important;
-  width: min(46vw, 370px) !important;
-}
+  .nine-eleven {
+    font-size: 1.12rem;
+  }
 
-html[data-screen="phone-landscape"] .step-content {
-  padding: 14px 12px !important;
-}
+  .by-marcos-script {
+    left: 39px;
+    font-size: 0.53rem;
+  }
 
-html[data-screen="phone-landscape"] .scene-specs,
-html[data-screen="phone-landscape"] .scene-notes,
-html[data-screen="phone-landscape"] .project-disclaimer {
-  display: none !important;
-}
+  .top-actions {
+    gap: 3px;
+  }
 
-html[data-screen="phone-landscape"] .cockpit-look-hint,
-html[data-screen="compact-landscape"] .cockpit-look-hint {
-  top: 72px;
-  left: 30%;
-}
+  .top-action-button {
+    min-width: 32px;
+    height: 32px;
+    padding-inline: 7px;
+  }
 
-html[data-aspect="ultrawide"] .configurator-panel {
-  right: clamp(28px, 3.2vw, 62px) !important;
-  width: min(440px, 27vw) !important;
-}
+  .scene-layer {
+    position: absolute;
+    inset: var(--mobile-topbar-height) 0 auto 0 !important;
+    width: 100%;
+    height: var(--mobile-scene-height);
+    overflow: hidden;
+  }
 
-html[data-aspect="ultrawide"] .scene-specs {
-  left: clamp(32px, 4vw, 74px);
-}
+  .showroom-floor-glow {
+    left: 50%;
+    bottom: 43%;
+    width: 130vw;
+  }
 
-@media (max-height: 680px) and (orientation: landscape) {
   .configurator-panel {
-    top: 76px !important;
-    bottom: 10px !important;
+    position: absolute !important;
+    top: calc(var(--mobile-topbar-height) + var(--mobile-scene-height) + 8px) !important;
+    left: 8px !important;
+    right: 8px !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto minmax(0, 1fr) auto !important;
+    border-radius: 20px !important;
+    overflow: hidden;
+  }
+
+  .step-nav {
+    min-width: 0 !important;
+    display: flex;
+    gap: 4px;
+    padding: 8px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.42);
+    scrollbar-width: none;
+  }
+
+  .step-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .step-nav button {
+    flex: 0 0 auto;
+    width: auto !important;
+    min-height: 38px;
+    padding: 8px 11px !important;
+    text-align: center;
+  }
+
+  .step-nav button strong {
+    font-size: 0.56rem;
+    white-space: nowrap;
   }
 
   .step-content {
-    padding-block: 14px !important;
+    min-height: 0;
+    padding: 16px 15px !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
   }
 
-  .detail-options,
-  .lighting-options {
-    gap: 16px;
+  .view-build-button {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    min-height: 54px;
   }
 
-  .selection-preview {
-    height: 28px;
+  .scene-specs,
+  .scene-notes,
+  .project-disclaimer {
+    display: none !important;
+  }
+
+  .cockpit-look-hint {
+    top: calc(var(--mobile-topbar-height) + 10px);
+    padding: 8px 12px;
+    font-size: 0.54rem;
+  }
+
+  .intro-content {
+    width: 100%;
+    min-height: 100%;
+    padding: max(34px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom));
+    overflow: hidden;
+  }
+
+  .intro-title {
+    width: 100%;
+    gap: 18px;
+  }
+
+  .intro-title-small {
+    max-width: 88vw;
+    font-size: clamp(0.68rem, 3vw, 0.9rem);
+    letter-spacing: 0.24em;
+  }
+
+  .intro-title-911 {
+    max-width: 92vw;
+    font-size: clamp(3.9rem, 21vw, 5.3rem);
+    line-height: 0.82;
+    letter-spacing: -0.025em;
+    white-space: nowrap;
+    transform: skewX(-10deg) scaleX(0.82);
+  }
+
+  .intro-byline {
+    margin-top: 24px;
+    font-size: 1rem;
+  }
+
+  .intro-start-button {
+    width: min(82vw, 360px);
+    height: 54px;
+    margin-top: 32px;
+    font-size: 0.82rem;
+    letter-spacing: 0.3em;
+  }
+
+  .intro-brand-wordmark {
+    width: 132px;
+    margin-top: 42px;
+  }
+
+  .intro-crest-backdrop {
+    width: min(92vw, 430px);
+    right: -34vw;
+    top: 57%;
+  }
+}
+
+@media (max-width: 390px) and (orientation: portrait) {
+  :root {
+    --mobile-scene-height: 40svh;
+  }
+
+  .intro-title-911 {
+    font-size: clamp(3.5rem, 19vw, 4.7rem);
+    transform: skewX(-9deg) scaleX(0.78);
+  }
+
+  .intro-start-button {
+    margin-top: 28px;
+  }
+
+  .intro-brand-wordmark {
+    margin-top: 34px;
+  }
+
+  .step-content {
+    padding: 14px 13px !important;
+  }
+}
+
+@media (max-height: 700px) and (max-width: 820px) and (orientation: portrait) {
+  :root {
+    --mobile-scene-height: 38svh;
+  }
+
+  .configurator-panel {
+    top: calc(var(--mobile-topbar-height) + var(--mobile-scene-height) + 6px) !important;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cockpit-look-hint {
-    animation: none;
+    transition: none;
   }
 }
-/* V27 END */
+/* V27.1 END */

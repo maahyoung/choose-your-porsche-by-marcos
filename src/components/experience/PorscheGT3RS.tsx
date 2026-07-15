@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { ThreeEvent, useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
@@ -8,7 +8,7 @@ import { getPaint } from "@/config/paints";
 import { getCaliperOption } from "@/config/brakes";
 import { getWheelFinishOption } from "@/config/wheels";
 import { useConfigurator } from "@/store/configurator";
-import { VehicleLightEffects } from "./VehicleLightEffects";
+import { HeadlightEffects } from "./HeadlightEffects";
 
 const MODEL_URL = "/models/porsche-911-gt3-rs-992.glb";
 const HOOD_NODE_NAME = "TwiXeR_992_gt3rs_carbon_hood";
@@ -125,7 +125,6 @@ export function PorscheGT3RS() {
   const wingInstalled = useConfigurator((state) => state.wingInstalled);
   const headlights = useConfigurator((state) => state.headlights);
   const taillights = useConfigurator((state) => state.taillights);
-  const hazards = useConfigurator((state) => state.hazards);
   const transitionNonce = useConfigurator((state) => state.transitionNonce);
   const environmentId = useConfigurator((state) => state.environmentId);
   const cameraPresetId = useConfigurator((state) => state.cameraPresetId);
@@ -134,7 +133,6 @@ export function PorscheGT3RS() {
   const wheel = useMemo(() => getWheelFinishOption(wheelId), [wheelId]);
   const caliper = useMemo(() => getCaliperOption(caliperId), [caliperId]);
   const transitionStart = useRef(0);
-  const [hazardOn, setHazardOn] = useState(true);
   const pointerGesture = useRef<{
     pointerId: number;
     startX: number;
@@ -278,16 +276,6 @@ export function PorscheGT3RS() {
     if (antichrome) antichrome.visible = !metallic;
     if (chrome) chrome.visible = metallic;
   }, [exhaustFinishId, model]);
-
-  useEffect(() => {
-    if (!hazards) return;
-
-    const interval = window.setInterval(() => {
-      setHazardOn((value) => !value);
-    }, 520);
-
-    return () => window.clearInterval(interval);
-  }, [hazards]);
 
   useEffect(() => {
     forEachMeshMaterial(model, (mesh, standard) => {
@@ -474,21 +462,6 @@ export function PorscheGT3RS() {
         standard.toneMapped = headlights ? false : (defaults?.toneMapped ?? true);
       }
 
-      const isFrontSignal =
-        objectName.includes("signal_l_bumper") ||
-        objectName.includes("signal_r_bumper") ||
-        materialName.includes("signal_l_bumper") ||
-        materialName.includes("signal_r_bumper");
-
-      if (isFrontSignal) {
-        standard.color.set(hazards && hazardOn ? "#ff8a00" : "#2b1a0e");
-        standard.emissive.set("#ff6a00");
-        standard.emissiveIntensity = hazards && hazardOn ? 4.1 : 0;
-        standard.roughness = 0.22;
-        standard.metalness = 0;
-        standard.toneMapped = !(hazards && hazardOn);
-      }
-
       const isTailLight =
         objectName.includes("taillight") ||
         objectName.includes("brakelight") ||
@@ -514,8 +487,6 @@ export function PorscheGT3RS() {
   }, [
     caliper,
     exhaustFinishId,
-    hazardOn,
-    hazards,
     headlights,
     materialDefaults,
     mirrorFinishId,
@@ -636,12 +607,9 @@ export function PorscheGT3RS() {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
       />
-      <VehicleLightEffects
+      <HeadlightEffects
         headlights={headlights}
-        indicatorsOn={hazards && hazardOn}
         environmentId={environmentId}
-        leftMirrorVisible={!leftDoorOpen}
-        rightMirrorVisible={!rightDoorOpen}
       />
     </group>
   );

@@ -178,10 +178,8 @@ export function ConfiguratorPanel() {
   const toggleWingInstalled = useConfigurator((state) => state.toggleWingInstalled);
   const headlights = useConfigurator((state) => state.headlights);
   const taillights = useConfigurator((state) => state.taillights);
-  const hazards = useConfigurator((state) => state.hazards);
   const toggleHeadlights = useConfigurator((state) => state.toggleHeadlights);
   const toggleTaillights = useConfigurator((state) => state.toggleTaillights);
-  const toggleHazards = useConfigurator((state) => state.toggleHazards);
   const summaryMode = useConfigurator((state) => state.summaryMode);
   const setSummaryMode = useConfigurator((state) => state.setSummaryMode);
   const replayTransition = useConfigurator((state) => state.replayTransition);
@@ -485,13 +483,6 @@ export function ConfiguratorPanel() {
                     label={t.taillights}
                     active={taillights}
                     onClick={toggleTaillights}
-                    onLabel={t.on}
-                    offLabel={t.off}
-                  />
-                  <Toggle
-                    label={t.hazards}
-                    active={hazards}
-                    onClick={toggleHazards}
                     onLabel={t.on}
                     offLabel={t.off}
                   />
