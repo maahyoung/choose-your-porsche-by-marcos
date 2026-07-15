@@ -19,22 +19,6 @@ const qualityLabels = {
   },
 } as const;
 
-function SpeakerIcon({ muted }: { muted: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="top-action-svg">
-      <path d="M4 9.4v5.2h3.4l4.4 3.7V5.7L7.4 9.4H4Z" />
-      {muted ? (
-        <path d="m15.4 9 5.1 6m0-6-5.1 6" />
-      ) : (
-        <>
-          <path d="M15.2 9.2a4 4 0 0 1 0 5.6" />
-          <path d="M18 6.7a7.4 7.4 0 0 1 0 10.6" />
-        </>
-      )}
-    </svg>
-  );
-}
-
 function SlidersIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="top-action-svg">
@@ -57,8 +41,6 @@ function ShareIcon() {
 export function TopBar() {
   const language = useConfigurator((state) => state.language);
   const setLanguage = useConfigurator((state) => state.setLanguage);
-  const soundEnabled = useConfigurator((state) => state.soundEnabled);
-  const setSoundEnabled = useConfigurator((state) => state.setSoundEnabled);
   const quality = useConfigurator((state) => state.quality);
   const paintId = useConfigurator((state) => state.paintId);
   const wheelId = useConfigurator((state) => state.wheelId);
@@ -137,15 +119,6 @@ export function TopBar() {
             title="Change language"
           >
             {language.toUpperCase()}
-          </button>
-
-          <button
-            className="top-action-button icon-action"
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            aria-label={soundEnabled ? `${t.sound}: ${t.on}` : `${t.sound}: ${t.off}`}
-            title={soundEnabled ? `${t.sound}: ${t.on}` : `${t.sound}: ${t.off}`}
-          >
-            <SpeakerIcon muted={!soundEnabled} />
           </button>
 
           <button

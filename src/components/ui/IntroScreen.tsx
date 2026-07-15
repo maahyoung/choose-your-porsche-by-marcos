@@ -19,25 +19,21 @@ export function IntroScreen() {
 
       <div className="intro-content">
         <h1 className="intro-title">
-          <span>Build your own</span>
-          <span>911</span>
+          <span className="intro-title-small">Build your own</span>
+          <span className="intro-title-911">911</span>
         </h1>
 
         <p className="intro-byline">{t.by}</p>
-        <p className="intro-tagline">{t.tagline}</p>
+
+        <button className="intro-start-button" onClick={() => enter(false)}>
+          {t.start}
+        </button>
 
         <img
           className="intro-brand-wordmark"
           src="/brand/porsche-logo-alt.svg"
           alt="Porsche"
         />
-
-        <p className="intro-sound-note">{t.soundNote}</p>
-
-        <div className="intro-actions">
-          <button className="intro-primary" onClick={() => enter(true)}>{t.enterSound}</button>
-          <button className="intro-secondary" onClick={() => enter(false)}>{t.enterMuted}</button>
-        </div>
       </div>
     </section>
   );
