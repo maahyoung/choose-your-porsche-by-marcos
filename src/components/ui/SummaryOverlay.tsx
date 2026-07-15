@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
@@ -5,6 +6,13 @@ import { copy } from "@/config/translations";
 import { getPaint } from "@/config/paints";
 import { getCaliperOption } from "@/config/brakes";
 import { getWheelFinishOption } from "@/config/wheels";
+import {
+  getCameraPreset,
+  getEnvironment,
+  getExhaustFinish,
+  getMirrorFinish,
+  getRoofFinish,
+} from "@/config/details";
 import { useConfigurator } from "@/store/configurator";
 
 const performanceSpecs = [
@@ -20,6 +28,11 @@ export function SummaryOverlay() {
   const paintId = useConfigurator((state) => state.paintId);
   const wheelId = useConfigurator((state) => state.wheelId);
   const caliperId = useConfigurator((state) => state.caliperId);
+  const roofFinishId = useConfigurator((state) => state.roofFinishId);
+  const mirrorFinishId = useConfigurator((state) => state.mirrorFinishId);
+  const exhaustFinishId = useConfigurator((state) => state.exhaustFinishId);
+  const environmentId = useConfigurator((state) => state.environmentId);
+  const cameraPresetId = useConfigurator((state) => state.cameraPresetId);
   const hoodOpen = useConfigurator((state) => state.hoodOpen);
   const leftDoorOpen = useConfigurator((state) => state.leftDoorOpen);
   const rightDoorOpen = useConfigurator((state) => state.rightDoorOpen);
@@ -28,6 +41,11 @@ export function SummaryOverlay() {
   const paint = getPaint(paintId);
   const wheel = getWheelFinishOption(wheelId);
   const caliper = getCaliperOption(caliperId);
+  const roof = getRoofFinish(roofFinishId);
+  const mirrors = getMirrorFinish(mirrorFinishId);
+  const exhaust = getExhaustFinish(exhaustFinishId);
+  const environment = getEnvironment(environmentId);
+  const camera = getCameraPreset(cameraPresetId);
 
   return (
     <AnimatePresence>
@@ -55,7 +73,13 @@ export function SummaryOverlay() {
 
             <div className="summary-specs">
               <span>992 · 911 GT3 RS</span>
-              <span>{paint.name[language]} · {wheel.name[language]} · {caliper.name[language]} {t.calipers}{hoodOpen ? ` · ${t.frontHood}: ${t.on}` : ""}{leftDoorOpen ? ` · ${t.leftDoor}: ${t.on}` : ""}{rightDoorOpen ? ` · ${t.rightDoor}: ${t.on}` : ""}{!wingInstalled ? ` · ${t.rearWing}: ${t.off}` : ""} · by Marcos</span>
+              <span>
+                {paint.name[language]} · {wheel.name[language]} · {caliper.name[language]} {t.calipers} · {roof.name[language]} · {mirrors.name[language]} · {exhaust.name[language]} · {environment.name[language]} · {camera.name[language]}
+                {hoodOpen ? ` · ${t.frontHood}: ${t.on}` : ""}
+                {leftDoorOpen ? ` · ${t.leftDoor}: ${t.on}` : ""}
+                {rightDoorOpen ? ` · ${t.rightDoor}: ${t.on}` : ""}
+                {!wingInstalled ? ` · ${t.rearWing}: ${t.off}` : ""} · by Marcos
+              </span>
             </div>
 
             <div className="summary-spec-grid">

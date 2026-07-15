@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { copy } from "@/config/translations";
@@ -25,7 +26,7 @@ export function IntroScreen() {
 
         <p className="intro-byline">{t.by}</p>
 
-        <button className="intro-start-button" onClick={() => enter(false)}>
+        <button className="intro-start-button" onClick={enter}>
           {t.start}
         </button>
 

@@ -13,6 +13,10 @@ const MODEL_URL = "/models/porsche-911-gt3-rs-992.glb";
 const HOOD_NODE_NAME = "TwiXeR_992_gt3rs_carbon_hood";
 const LEFT_DOOR_NODE_NAME = "TwiXeR_992_gt3rs_door_L";
 const RIGHT_DOOR_NODE_NAME = "TwiXeR_992_gt3rs_door_R";
+const ROOF_NODE_NAME = "TwiXeR_992_gt3rs_carbon_roof";
+const MIRROR_NODE_NAMES = ["TwiXeR_992_mirror_L", "TwiXeR_992_mirror_R"] as const;
+const EXHAUST_ANTICHROME_NODE_NAME = "TwiXeR_992_exhausttip_3_antichrome";
+const EXHAUST_CHROME_NODE_NAME = "TwiXeR_992_exhausttip_3_chrome";
 const REAR_WING_NODE_NAMES = [
   "TwiXeR_992_gt3rs_carbon_Wing",
   "TwiXeR_992_gt3rs_left_leg",
@@ -103,14 +107,14 @@ export function PorscheGT3RS() {
   const hoodPivot = useRef<THREE.Group | null>(null);
   const leftDoorPivot = useRef<THREE.Group | null>(null);
   const rightDoorPivot = useRef<THREE.Group | null>(null);
-  const materialDefaults = useRef(
-    new WeakMap<THREE.MeshStandardMaterial, MaterialDefaults>(),
-  );
   const { scene } = useGLTF(MODEL_URL);
 
   const paintId = useConfigurator((state) => state.paintId);
   const wheelId = useConfigurator((state) => state.wheelId);
   const caliperId = useConfigurator((state) => state.caliperId);
+  const roofFinishId = useConfigurator((state) => state.roofFinishId);
+  const mirrorFinishId = useConfigurator((state) => state.mirrorFinishId);
+  const exhaustFinishId = useConfigurator((state) => state.exhaustFinishId);
   const hoodOpen = useConfigurator((state) => state.hoodOpen);
   const toggleHoodOpen = useConfigurator((state) => state.toggleHoodOpen);
   const leftDoorOpen = useConfigurator((state) => state.leftDoorOpen);
@@ -129,8 +133,9 @@ export function PorscheGT3RS() {
   const transitionStart = useRef(0);
   const [hazardOn, setHazardOn] = useState(true);
 
-  const model = useMemo(() => {
+  const { model, materialDefaults } = useMemo(() => {
     const clone = scene.clone(true);
+    const defaults = new WeakMap<THREE.MeshStandardMaterial, MaterialDefaults>();
 
     clone.traverse((child) => {
       child.matrixAutoUpdate = true;
@@ -144,7 +149,7 @@ export function PorscheGT3RS() {
         const cloned = material.clone();
 
         if (cloned instanceof THREE.MeshStandardMaterial) {
-          materialDefaults.current.set(cloned, captureDefaults(cloned));
+          defaults.set(cloned, captureDefaults(cloned));
         }
 
         return cloned;
@@ -155,7 +160,7 @@ export function PorscheGT3RS() {
         : cloneMaterial(child.material);
     });
 
-    return clone;
+    return { model: clone, materialDefaults: defaults };
   }, [scene]);
 
   useEffect(() => {
@@ -254,12 +259,16 @@ export function PorscheGT3RS() {
   }, [model, wingInstalled]);
 
   useEffect(() => {
-    if (!hazards) {
-      setHazardOn(false);
-      return;
-    }
+    const antichrome = model.getObjectByName(EXHAUST_ANTICHROME_NODE_NAME);
+    const chrome = model.getObjectByName(EXHAUST_CHROME_NODE_NAME);
+    const metallic = exhaustFinishId === "metallic";
 
-    setHazardOn(true);
+    if (antichrome) antichrome.visible = !metallic;
+    if (chrome) chrome.visible = metallic;
+  }, [exhaustFinishId, model]);
+
+  useEffect(() => {
+    if (!hazards) return;
 
     const interval = window.setInterval(() => {
       setHazardOn((value) => !value);
@@ -272,7 +281,17 @@ export function PorscheGT3RS() {
     forEachMeshMaterial(model, (mesh, standard) => {
       const objectName = mesh.name.toLowerCase();
       const materialName = standard.name.toLowerCase();
-      const defaults = materialDefaults.current.get(standard);
+      const defaults = materialDefaults.get(standard);
+
+      if (defaults) {
+        standard.color.copy(defaults.color);
+        standard.emissive.copy(defaults.emissive);
+        standard.emissiveIntensity = defaults.emissiveIntensity;
+        standard.roughness = defaults.roughness;
+        standard.metalness = defaults.metalness;
+        standard.envMapIntensity = defaults.envMapIntensity;
+        standard.toneMapped = defaults.toneMapped;
+      }
 
       const isCarbon =
         materialName.includes("carbon") || objectName.includes("carbon");
@@ -292,6 +311,16 @@ export function PorscheGT3RS() {
         isBrakeDiscAssembly && materialName.includes("misc_chrome");
       const isBrakeRotorHardware =
         isBrakeDiscAssembly && materialName.includes("misc.002");
+      const isRoofPanel =
+        objectHasNamedAncestor(mesh, ROOF_NODE_NAME) &&
+        (materialName.includes("carbon_roof") || objectName.includes("carbon_roof"));
+      const isMirrorCap =
+        MIRROR_NODE_NAMES.some((nodeName) =>
+          objectHasNamedAncestor(mesh, nodeName),
+        ) && materialName.includes("carpaint.003");
+      const isAntichromeExhaustSurface =
+        objectHasNamedAncestor(mesh, EXHAUST_ANTICHROME_NODE_NAME) &&
+        materialName.includes("exhausttip_antichrome");
 
       if (materialName.includes("carpaint.003")) {
         standard.color.set(paint.color);
@@ -313,6 +342,58 @@ export function PorscheGT3RS() {
         standard.metalness = 0.34;
         standard.roughness = 0.16;
         standard.envMapIntensity = 2.0;
+      }
+
+      if (isRoofPanel) {
+        if (roofFinishId === "body-color") {
+          standard.color.set(paint.color);
+          standard.metalness = Math.max(0.24, paint.metalness * 0.92);
+          standard.roughness = Math.min(0.11, Math.max(0.06, paint.roughness * 0.42));
+          standard.envMapIntensity = 2.55;
+        } else if (roofFinishId === "gloss-black") {
+          standard.color.set("#05070b");
+          standard.metalness = 0.62;
+          standard.roughness = 0.065;
+          standard.envMapIntensity = 2.8;
+        } else {
+          standard.color.set("#080b10");
+          standard.metalness = 0.44;
+          standard.roughness = 0.12;
+          standard.envMapIntensity = 2.55;
+        }
+      }
+
+      if (isMirrorCap) {
+        if (mirrorFinishId === "body-color") {
+          standard.color.set(paint.color);
+          standard.metalness = Math.max(0.24, paint.metalness * 0.92);
+          standard.roughness = Math.min(0.11, Math.max(0.06, paint.roughness * 0.42));
+          standard.envMapIntensity = 2.55;
+        } else if (mirrorFinishId === "carbon") {
+          standard.color.set("#080b10");
+          standard.metalness = 0.44;
+          standard.roughness = 0.12;
+          standard.envMapIntensity = 2.55;
+        } else {
+          standard.color.set("#05070b");
+          standard.metalness = 0.62;
+          standard.roughness = 0.065;
+          standard.envMapIntensity = 2.8;
+        }
+      }
+
+      if (isAntichromeExhaustSurface) {
+        if (exhaustFinishId === "gloss-black") {
+          standard.color.set("#05070a");
+          standard.metalness = 0.7;
+          standard.roughness = 0.08;
+          standard.envMapIntensity = 2.6;
+        } else {
+          standard.color.set("#101318");
+          standard.metalness = 0.34;
+          standard.roughness = 0.38;
+          standard.envMapIntensity = 1.45;
+        }
       }
 
       if (materialName.includes("wheels_chrome")) {
@@ -415,7 +496,20 @@ export function PorscheGT3RS() {
 
       standard.needsUpdate = true;
     });
-  }, [caliper, hazardOn, hazards, headlights, model, paint, taillights, wheel]);
+  }, [
+    caliper,
+    exhaustFinishId,
+    hazardOn,
+    hazards,
+    headlights,
+    materialDefaults,
+    mirrorFinishId,
+    model,
+    paint,
+    roofFinishId,
+    taillights,
+    wheel,
+  ]);
 
   useFrame((state, delta) => {
     if (!group.current) return;
@@ -423,11 +517,12 @@ export function PorscheGT3RS() {
     const elapsed = performance.now() - transitionStart.current;
     const pulse = elapsed < 900 ? Math.sin((elapsed / 900) * Math.PI) : 0;
 
-    group.current.position.x = pulse * 0.4;
+    group.current.position.x = pulse * 0.12;
     group.current.position.y =
-      -0.14 + Math.sin(state.clock.elapsedTime * 0.72) * 0.006;
+      -0.14 + Math.sin(state.clock.elapsedTime * 0.72) * 0.006 + pulse * 0.014;
     group.current.rotation.y =
-      -0.08 + state.pointer.x * 0.022 + pulse * 0.06;
+      -0.08 + state.pointer.x * 0.022 + pulse * 0.025;
+    group.current.scale.setScalar(1.1 * (1 + pulse * 0.006));
 
     if (hoodPivot.current) {
       const target = hoodOpen ? -0.88 : 0;

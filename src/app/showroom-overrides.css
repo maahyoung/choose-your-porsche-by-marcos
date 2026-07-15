@@ -1502,3 +1502,327 @@ body {
     grid-template-columns: 1fr auto;
   }
 }
+
+/* V25 — DETAILS, CAMERA, ENVIRONMENT AND CINEMATIC POLISH */
+.showroom-backdrop,
+.showroom-side-falloff,
+.showroom-horizon-band,
+.showroom-floor-glow {
+  transition: background 0.7s ease, opacity 0.7s ease, filter 0.7s ease;
+}
+
+html[data-environment="studio"] .showroom-backdrop {
+  background:
+    radial-gradient(ellipse at 48% 30%, rgba(76, 84, 93, 0.92) 0%, rgba(37, 42, 48, 0.98) 34%, rgba(17, 20, 24, 1) 78%, #0b0d10 100%),
+    linear-gradient(180deg, #30363d 0%, #171a1e 52%, #090b0e 100%);
+}
+
+html[data-environment="studio"] .showroom-side-falloff {
+  background:
+    radial-gradient(circle at 4% 54%, rgba(139, 153, 168, 0.18), transparent 30%),
+    radial-gradient(circle at 96% 48%, rgba(111, 124, 139, 0.16), transparent 28%);
+}
+
+html[data-environment="studio"] .showroom-horizon-band {
+  background: linear-gradient(180deg, transparent, rgba(112, 123, 135, 0.12) 45%, rgba(6, 8, 10, 0.55));
+}
+
+html[data-environment="studio"] .showroom-floor-glow {
+  background: radial-gradient(ellipse, rgba(161, 174, 187, 0.2), rgba(43, 48, 54, 0.13) 48%, transparent 78%);
+}
+
+html[data-environment="night"] .showroom-backdrop {
+  background:
+    radial-gradient(ellipse at 48% 27%, rgba(40, 68, 103, 0.78) 0%, rgba(13, 25, 43, 0.98) 38%, rgba(5, 11, 21, 1) 76%, #02060d 100%),
+    linear-gradient(180deg, #10223a 0%, #07101e 54%, #02050b 100%);
+}
+
+html[data-environment="night"] .showroom-side-falloff {
+  background:
+    radial-gradient(circle at 4% 54%, rgba(47, 107, 170, 0.22), transparent 31%),
+    radial-gradient(circle at 96% 48%, rgba(81, 133, 191, 0.18), transparent 29%);
+}
+
+html[data-environment="night"] .showroom-horizon-band {
+  background: linear-gradient(180deg, transparent, rgba(55, 109, 168, 0.13) 48%, rgba(1, 5, 12, 0.7));
+}
+
+html[data-environment="night"] .showroom-floor-glow {
+  background: radial-gradient(ellipse, rgba(74, 137, 205, 0.24), rgba(12, 31, 54, 0.14) 50%, transparent 80%);
+}
+
+.cinematic-transition {
+  position: absolute;
+  inset: -20%;
+  z-index: 8;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-58%) skewX(-13deg);
+  background: linear-gradient(
+    105deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.04) 42%,
+    rgba(255, 255, 255, 0.38) 49%,
+    rgba(255, 255, 255, 0.06) 56%,
+    transparent 67%
+  );
+  filter: blur(9px);
+  animation: v25CinematicSweep 0.92s cubic-bezier(0.2, 0.72, 0.2, 1) both;
+}
+
+@keyframes v25CinematicSweep {
+  0% { opacity: 0; transform: translateX(-58%) skewX(-13deg); }
+  18% { opacity: 0.72; }
+  100% { opacity: 0; transform: translateX(58%) skewX(-13deg); }
+}
+
+.configurator-panel {
+  width: min(420px, 36vw) !important;
+  grid-template-columns: 118px 1fr !important;
+}
+
+.step-nav button strong {
+  font-size: 0.68rem;
+  line-height: 1.22;
+}
+
+.detail-options,
+.lighting-options {
+  display: grid;
+  gap: 25px;
+}
+
+.detail-options section,
+.lighting-options section,
+.camera-options {
+  min-width: 0;
+}
+
+.detail-options h2,
+.lighting-options h2,
+.camera-options h2 {
+  margin-bottom: 12px;
+  font-size: 1.05rem;
+}
+
+.selection-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.selection-option {
+  position: relative;
+  min-width: 0;
+  padding: 7px 5px 8px;
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  border: 1px solid rgba(18, 22, 27, 0.09);
+  border-radius: 12px;
+  color: rgba(18, 22, 27, 0.62);
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.selection-option:hover {
+  transform: translateY(-1px);
+  color: #11151a;
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.selection-option.active {
+  color: #11151a;
+  border-color: rgba(18, 22, 27, 0.28);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.62), rgba(224, 230, 235, 0.28));
+  box-shadow:
+    0 8px 18px rgba(35, 42, 51, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.selection-preview {
+  width: 100%;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--selection-preview);
+  box-shadow:
+    inset 0 0 0 1px rgba(18, 22, 27, 0.12),
+    0 4px 10px rgba(18, 22, 27, 0.06);
+}
+
+.selection-option small {
+  width: 100%;
+  overflow: hidden;
+  font-size: 0.51rem;
+  line-height: 1.22;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selection-check {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.selection-option.active .selection-check {
+  color: #fff;
+  background: #11151a;
+}
+
+.selection-check svg {
+  width: 10px;
+  height: 10px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.environment-grid .selection-preview {
+  height: 42px;
+}
+
+.camera-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.camera-grid .selection-option:last-child {
+  grid-column: 1 / -1;
+}
+
+.camera-grid .selection-preview {
+  height: 48px;
+}
+
+.light-controls {
+  padding-top: 4px;
+}
+
+.summary-mini p,
+.summary-specs span:last-child {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1100px) and (orientation: landscape) {
+  .configurator-panel {
+    width: min(390px, 42vw) !important;
+    grid-template-columns: 104px 1fr !important;
+  }
+
+  .step-nav button strong {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 760px) and (orientation: landscape) {
+  .configurator-panel {
+    width: 48vw !important;
+    grid-template-columns: 82px 1fr !important;
+  }
+
+  .selection-grid {
+    gap: 5px;
+  }
+
+  .selection-preview {
+    height: 27px;
+  }
+
+  .selection-option small {
+    font-size: 0.44rem;
+  }
+}
+
+@media (orientation: portrait) {
+  .configurator-panel {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto minmax(0, 1fr) auto !important;
+    max-height: min(61svh, 590px) !important;
+  }
+
+  .step-nav {
+    min-width: 0 !important;
+    display: flex;
+    gap: 4px;
+    padding: 8px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.42);
+    scrollbar-width: none;
+  }
+
+  .step-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .step-nav button {
+    flex: 0 0 auto;
+    width: auto !important;
+    min-height: 38px;
+    padding: 8px 11px !important;
+    text-align: center;
+  }
+
+  .step-nav button strong {
+    font-size: 0.57rem;
+    white-space: nowrap;
+  }
+
+  .step-content {
+    min-height: 0;
+    padding: 18px 16px !important;
+  }
+
+  .view-build-button {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+  }
+
+  .selection-preview {
+    height: 38px;
+  }
+
+  .camera-grid .selection-preview {
+    height: 50px;
+  }
+}
+
+@media (max-width: 520px) and (orientation: portrait) {
+  .configurator-panel {
+    left: 8px !important;
+    right: 8px !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    max-height: min(64svh, 610px) !important;
+  }
+
+  .selection-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .selection-option {
+    padding-inline: 4px;
+  }
+
+  .selection-option small {
+    font-size: 0.48rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinematic-transition {
+    display: none;
+  }
+}
+/* V25 END */

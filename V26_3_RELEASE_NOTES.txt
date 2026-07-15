@@ -1,0 +1,19 @@
+CHOOSE YOUR PORSCHE BY MARCOS — VERSION 26.3
+
+Release purpose
+- Complete repository-ready source package.
+- Uses the exact project root folder name: choose-your-porsche-by-marcos
+- Distributed using the repository-compatible archive name:
+  choose-your-porsche-by-marcos-phase-01.zip
+
+Foundation
+- Based on the complete V25.3 reconstruction.
+- Includes Next.js configuration, TypeScript configuration, package manifest,
+  source code, Porsche branding assets, fonts, and the Porsche GT3 RS GLB model.
+
+Packaging
+- Single project root folder.
+- No extra wrapper directory.
+- No macOS metadata folders.
+- No node_modules, .next, or generated build cache.
+- Standard ZIP/Deflate format for broad compatibility.

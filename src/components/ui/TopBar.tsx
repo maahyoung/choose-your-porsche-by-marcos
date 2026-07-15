@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState } from "react";
@@ -45,10 +46,18 @@ export function TopBar() {
   const paintId = useConfigurator((state) => state.paintId);
   const wheelId = useConfigurator((state) => state.wheelId);
   const caliperId = useConfigurator((state) => state.caliperId);
+  const roofFinishId = useConfigurator((state) => state.roofFinishId);
+  const mirrorFinishId = useConfigurator((state) => state.mirrorFinishId);
+  const exhaustFinishId = useConfigurator((state) => state.exhaustFinishId);
+  const environmentId = useConfigurator((state) => state.environmentId);
+  const cameraPresetId = useConfigurator((state) => state.cameraPresetId);
   const hoodOpen = useConfigurator((state) => state.hoodOpen);
   const leftDoorOpen = useConfigurator((state) => state.leftDoorOpen);
   const rightDoorOpen = useConfigurator((state) => state.rightDoorOpen);
   const wingInstalled = useConfigurator((state) => state.wingInstalled);
+  const headlights = useConfigurator((state) => state.headlights);
+  const taillights = useConfigurator((state) => state.taillights);
+  const hazards = useConfigurator((state) => state.hazards);
   const setQuality = useConfigurator((state) => state.setQuality);
 
   const [copied, setCopied] = useState(false);
@@ -65,10 +74,18 @@ export function TopBar() {
     buildUrl.searchParams.set("paint", paintId);
     buildUrl.searchParams.set("wheel", wheelId);
     buildUrl.searchParams.set("caliper", caliperId);
+    buildUrl.searchParams.set("roof", roofFinishId);
+    buildUrl.searchParams.set("mirrors", mirrorFinishId);
+    buildUrl.searchParams.set("exhaust", exhaustFinishId);
+    buildUrl.searchParams.set("environment", environmentId);
+    buildUrl.searchParams.set("camera", cameraPresetId);
     buildUrl.searchParams.set("hood", hoodOpen ? "1" : "0");
     buildUrl.searchParams.set("doorL", leftDoorOpen ? "1" : "0");
     buildUrl.searchParams.set("doorR", rightDoorOpen ? "1" : "0");
     buildUrl.searchParams.set("wing", wingInstalled ? "1" : "0");
+    buildUrl.searchParams.set("lights", headlights ? "1" : "0");
+    buildUrl.searchParams.set("tails", taillights ? "1" : "0");
+    buildUrl.searchParams.set("hazards", hazards ? "1" : "0");
     const url = buildUrl.toString();
 
     try {

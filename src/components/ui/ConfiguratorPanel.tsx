@@ -5,18 +5,37 @@ import { AnimatePresence, motion } from "framer-motion";
 import { PAINTS, getPaint } from "@/config/paints";
 import { CALIPER_OPTIONS, getCaliperOption } from "@/config/brakes";
 import { WHEEL_FINISH_OPTIONS, getWheelFinishOption } from "@/config/wheels";
-import { copy } from "@/config/translations";
+import {
+  CAMERA_PRESET_OPTIONS,
+  ENVIRONMENT_OPTIONS,
+  EXHAUST_FINISH_OPTIONS,
+  MIRROR_FINISH_OPTIONS,
+  ROOF_FINISH_OPTIONS,
+  getCameraPreset,
+  getEnvironment,
+  getExhaustFinish,
+  getMirrorFinish,
+  getRoofFinish,
+} from "@/config/details";
+import { copy, type Language } from "@/config/translations";
 import { StepId, useConfigurator } from "@/store/configurator";
 
 const steps: StepId[] = [
   "paint",
   "wheels",
+  "details",
   "exterior",
-  "graphics",
   "aero",
   "lighting",
+  "camera",
   "summary",
 ];
+
+type NamedChoice<T extends string> = {
+  id: T;
+  name: Record<Language, string>;
+  preview: string;
+};
 
 function Toggle({
   label,
@@ -39,6 +58,50 @@ function Toggle({
         <small>{active ? onLabel : offLabel}</small>
       </span>
     </button>
+  );
+}
+
+function SelectionGrid<T extends string>({
+  options,
+  selectedId,
+  language,
+  onSelect,
+  previewFor,
+  className = "",
+}: {
+  options: NamedChoice<T>[];
+  selectedId: T;
+  language: Language;
+  onSelect: (id: T) => void;
+  previewFor?: (option: NamedChoice<T>) => string;
+  className?: string;
+}) {
+  return (
+    <div className={`selection-grid ${className}`}>
+      {options.map((option) => {
+        const active = option.id === selectedId;
+        const preview = previewFor?.(option) ?? option.preview;
+
+        return (
+          <button
+            key={option.id}
+            className={`selection-option ${active ? "active" : ""}`}
+            onClick={() => onSelect(option.id)}
+            aria-pressed={active}
+          >
+            <span
+              className="selection-preview"
+              style={{ "--selection-preview": preview } as CSSProperties}
+              aria-hidden="true"
+            />
+            <small>{option.name[language]}</small>
+            <span className="selection-check" aria-hidden="true">
+              {active && <CheckIcon />}
+            </span>
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
@@ -95,6 +158,16 @@ export function ConfiguratorPanel() {
   const setWheelId = useConfigurator((state) => state.setWheelId);
   const caliperId = useConfigurator((state) => state.caliperId);
   const setCaliperId = useConfigurator((state) => state.setCaliperId);
+  const roofFinishId = useConfigurator((state) => state.roofFinishId);
+  const setRoofFinishId = useConfigurator((state) => state.setRoofFinishId);
+  const mirrorFinishId = useConfigurator((state) => state.mirrorFinishId);
+  const setMirrorFinishId = useConfigurator((state) => state.setMirrorFinishId);
+  const exhaustFinishId = useConfigurator((state) => state.exhaustFinishId);
+  const setExhaustFinishId = useConfigurator((state) => state.setExhaustFinishId);
+  const environmentId = useConfigurator((state) => state.environmentId);
+  const setEnvironmentId = useConfigurator((state) => state.setEnvironmentId);
+  const cameraPresetId = useConfigurator((state) => state.cameraPresetId);
+  const setCameraPresetId = useConfigurator((state) => state.setCameraPresetId);
   const hoodOpen = useConfigurator((state) => state.hoodOpen);
   const toggleHoodOpen = useConfigurator((state) => state.toggleHoodOpen);
   const leftDoorOpen = useConfigurator((state) => state.leftDoorOpen);
@@ -112,10 +185,16 @@ export function ConfiguratorPanel() {
   const summaryMode = useConfigurator((state) => state.summaryMode);
   const setSummaryMode = useConfigurator((state) => state.setSummaryMode);
   const replayTransition = useConfigurator((state) => state.replayTransition);
+
   const t = copy[language];
   const selectedPaint = getPaint(paintId);
   const selectedWheel = getWheelFinishOption(wheelId);
   const selectedCaliper = getCaliperOption(caliperId);
+  const selectedRoof = getRoofFinish(roofFinishId);
+  const selectedMirror = getMirrorFinish(mirrorFinishId);
+  const selectedExhaust = getExhaustFinish(exhaustFinishId);
+  const selectedEnvironment = getEnvironment(environmentId);
+  const selectedCamera = getCameraPreset(cameraPresetId);
 
   const openSummary = () => {
     setActiveStep("summary");
@@ -138,6 +217,14 @@ export function ConfiguratorPanel() {
     const context = output.getContext("2d");
     if (!context) return;
 
+    const sceneBackground =
+      environmentId === "night"
+        ? "#07101e"
+        : environmentId === "studio"
+          ? "#171a1e"
+          : "#edf1f4";
+    context.fillStyle = sceneBackground;
+    context.fillRect(0, 0, output.width, output.height);
     context.drawImage(source, 0, 0, output.width, output.height);
 
     const scale = Math.max(1, output.width / 1600);
@@ -159,21 +246,21 @@ export function ConfiguratorPanel() {
     context.fillStyle = "rgba(17,21,26,0.66)";
     context.font = `${14 * scale}px Arial`;
     context.fillText(
-      `${selectedPaint.name[language]} · ${selectedWheel.name[language]} · ${selectedCaliper.name[language]} ${t.calipers}${hoodOpen ? ` · ${t.frontHood}` : ""}${leftDoorOpen ? ` · ${t.leftDoor}` : ""}${rightDoorOpen ? ` · ${t.rightDoor}` : ""}${!wingInstalled ? ` · ${t.rearWing}` : ""} · 518 HP`,
+      `${selectedPaint.name[language]} · ${selectedWheel.name[language]} · ${selectedRoof.name[language]} · ${selectedMirror.name[language]} · ${selectedExhaust.name[language]} · 518 HP`,
       52 * scale,
       output.height - 42 * scale,
     );
 
     const anchor = document.createElement("a");
     anchor.href = output.toDataURL("image/png");
-    anchor.download = `choose-your-porsche-${paintId}-${wheelId}-${caliperId}${hoodOpen ? "-hood-open" : ""}${leftDoorOpen ? "-driver-door-open" : ""}${rightDoorOpen ? "-passenger-door-open" : ""}${!wingInstalled ? "-wing-removed" : ""}-by-marcos.png`;
+    anchor.download = `choose-your-porsche-${paintId}-${wheelId}-${caliperId}-${roofFinishId}-${mirrorFinishId}-${exhaustFinishId}${!wingInstalled ? "-wing-removed" : ""}-by-marcos.png`;
     anchor.click();
   };
 
   return (
     <aside className={`configurator-panel ${summaryMode ? "summary-active" : ""}`}>
       <nav className="step-nav" aria-label="Configurator steps">
-        {steps.map((step, index) => (
+        {steps.map((step) => (
           <button
             key={step}
             className={activeStep === step ? "active" : ""}
@@ -220,8 +307,8 @@ export function ConfiguratorPanel() {
 
             {activeStep === "wheels" && (
               <div className="wheel-brake-options">
-                <section className="wheel-finish-section" aria-labelledby="wheel-finish-heading">
-                  <h2 id="wheel-finish-heading">{t.wheelFinish}</h2>
+                <section className="wheel-finish-section">
+                  <h2>{t.wheelFinish}</h2>
                   <div className="wheel-finish-grid">
                     {WHEEL_FINISH_OPTIONS.map((option) => {
                       const active = option.id === wheelId;
@@ -251,8 +338,8 @@ export function ConfiguratorPanel() {
                   <p className="option-next-note">{t.wheelDesignNote}</p>
                 </section>
 
-                <section className="caliper-section" aria-labelledby="caliper-heading">
-                  <h2 id="caliper-heading">{t.brakeCalipers}</h2>
+                <section className="caliper-section">
+                  <h2>{t.brakeCalipers}</h2>
                   <div className="caliper-grid">
                     {CALIPER_OPTIONS.map((option) => {
                       const active = option.id === caliperId;
@@ -284,6 +371,45 @@ export function ConfiguratorPanel() {
               </div>
             )}
 
+            {activeStep === "details" && (
+              <div className="detail-options">
+                <section>
+                  <h2>{t.roofFinish}</h2>
+                  <SelectionGrid
+                    options={ROOF_FINISH_OPTIONS}
+                    selectedId={roofFinishId}
+                    language={language}
+                    onSelect={setRoofFinishId}
+                    previewFor={(option) =>
+                      option.id === "body-color" ? selectedPaint.color : option.preview
+                    }
+                  />
+                </section>
+
+                <section>
+                  <h2>{t.mirrorFinish}</h2>
+                  <SelectionGrid
+                    options={MIRROR_FINISH_OPTIONS}
+                    selectedId={mirrorFinishId}
+                    language={language}
+                    onSelect={setMirrorFinishId}
+                    previewFor={(option) =>
+                      option.id === "body-color" ? selectedPaint.color : option.preview
+                    }
+                  />
+                </section>
+
+                <section>
+                  <h2>{t.exhaustFinish}</h2>
+                  <SelectionGrid
+                    options={EXHAUST_FINISH_OPTIONS}
+                    selectedId={exhaustFinishId}
+                    language={language}
+                    onSelect={setExhaustFinishId}
+                  />
+                </section>
+              </div>
+            )}
 
             {activeStep === "exterior" && (
               <div className="control-stack">
@@ -319,7 +445,6 @@ export function ConfiguratorPanel() {
               </div>
             )}
 
-
             {activeStep === "aero" && (
               <div className="control-stack">
                 <h2>{t.rearWing}</h2>
@@ -335,48 +460,64 @@ export function ConfiguratorPanel() {
             )}
 
             {activeStep === "lighting" && (
-              <div className="control-stack">
-                <Toggle
-                  label={t.headlights}
-                  active={headlights}
-                  onClick={toggleHeadlights}
-                  onLabel={t.on}
-                  offLabel={t.off}
-                />
-                <Toggle
-                  label={t.taillights}
-                  active={taillights}
-                  onClick={toggleTaillights}
-                  onLabel={t.on}
-                  offLabel={t.off}
-                />
-                <Toggle
-                  label={t.hazards}
-                  active={hazards}
-                  onClick={toggleHazards}
-                  onLabel={t.on}
-                  offLabel={t.off}
-                />
+              <div className="lighting-options">
+                <section>
+                  <h2>{t.environment}</h2>
+                  <p className="option-next-note">{t.environmentNote}</p>
+                  <SelectionGrid
+                    options={ENVIRONMENT_OPTIONS}
+                    selectedId={environmentId}
+                    language={language}
+                    onSelect={setEnvironmentId}
+                    className="environment-grid"
+                  />
+                </section>
+
+                <section className="control-stack light-controls">
+                  <Toggle
+                    label={t.headlights}
+                    active={headlights}
+                    onClick={toggleHeadlights}
+                    onLabel={t.on}
+                    offLabel={t.off}
+                  />
+                  <Toggle
+                    label={t.taillights}
+                    active={taillights}
+                    onClick={toggleTaillights}
+                    onLabel={t.on}
+                    offLabel={t.off}
+                  />
+                  <Toggle
+                    label={t.hazards}
+                    active={hazards}
+                    onClick={toggleHazards}
+                    onLabel={t.on}
+                    offLabel={t.off}
+                  />
+                </section>
               </div>
             )}
 
-            {activeStep !== "paint" &&
-              activeStep !== "wheels" &&
-              activeStep !== "exterior" &&
-              activeStep !== "aero" &&
-              activeStep !== "lighting" &&
-              activeStep !== "summary" && (
-                <div className="coming-soon">
-                  <span>PHASE 02</span>
-                  <p>{t.comingSoon}</p>
-                </div>
-              )}
+            {activeStep === "camera" && (
+              <div className="camera-options">
+                <h2>{t.cameraPresets}</h2>
+                <p className="option-next-note">{t.cameraNote}</p>
+                <SelectionGrid
+                  options={CAMERA_PRESET_OPTIONS}
+                  selectedId={cameraPresetId}
+                  language={language}
+                  onSelect={setCameraPresetId}
+                  className="camera-grid"
+                />
+              </div>
+            )}
 
             {activeStep === "summary" && (
               <div className="summary-mini">
                 <h2>{t.summaryTitle}</h2>
                 <p>
-                  {selectedPaint.name[language]} · {selectedWheel.name[language]} · {selectedCaliper.name[language]} {t.calipers}{hoodOpen ? ` · ${t.frontHood}` : ""}{leftDoorOpen ? ` · ${t.leftDoor}` : ""}{rightDoorOpen ? ` · ${t.rightDoor}` : ""}{!wingInstalled ? ` · ${t.rearWing}` : ""} · MARCOS911
+                  {selectedPaint.name[language]} · {selectedWheel.name[language]} · {selectedCaliper.name[language]} {t.calipers} · {selectedRoof.name[language]} · {selectedMirror.name[language]} · {selectedExhaust.name[language]} · {selectedEnvironment.name[language]} · {selectedCamera.name[language]}{hoodOpen ? ` · ${t.frontHood}` : ""}{leftDoorOpen ? ` · ${t.leftDoor}` : ""}{rightDoorOpen ? ` · ${t.rightDoor}` : ""}{!wingInstalled ? ` · ${t.rearWing}: ${t.off}` : ""} · MARCOS911
                 </p>
 
                 {summaryMode && (
