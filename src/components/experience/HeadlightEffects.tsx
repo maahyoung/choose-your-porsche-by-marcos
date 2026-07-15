@@ -4,8 +4,8 @@ import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { EnvironmentId } from "@/config/details";
 
-const HEADLIGHT_LEFT: [number, number, number] = [0.696, 0.68, 1.82];
-const HEADLIGHT_RIGHT: [number, number, number] = [-0.696, 0.68, 1.82];
+const HEADLIGHT_LEFT: [number, number, number] = [0.60, 0.70, 1.70];
+const HEADLIGHT_RIGHT: [number, number, number] = [-0.60, 0.70, 1.70];
 
 function createRadialTexture() {
   const size = 64;
@@ -123,10 +123,10 @@ export function HeadlightEffects({
 
       {headlights && (
         <>
-          <GlowSprite position={HEADLIGHT_LEFT} scale={[0.48, 0.48, 1]} opacity={0.62} />
-          <GlowSprite position={HEADLIGHT_RIGHT} scale={[0.48, 0.48, 1]} opacity={0.62} />
-          <GlowSprite position={HEADLIGHT_LEFT} scale={[0.18, 0.18, 1]} opacity={0.92} />
-          <GlowSprite position={HEADLIGHT_RIGHT} scale={[0.18, 0.18, 1]} opacity={0.92} />
+          <GlowSprite position={HEADLIGHT_LEFT} scale={[0.30, 0.30, 1]} opacity={0.45} />
+          <GlowSprite position={HEADLIGHT_RIGHT} scale={[0.30, 0.30, 1]} opacity={0.45} />
+          <GlowSprite position={HEADLIGHT_LEFT} scale={[0.12, 0.12, 1]} opacity={0.78} />
+          <GlowSprite position={HEADLIGHT_RIGHT} scale={[0.12, 0.12, 1]} opacity={0.78} />
         </>
       )}
     </group>
