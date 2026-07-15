@@ -8,6 +8,7 @@ import { getPaint } from "@/config/paints";
 import { getCaliperOption } from "@/config/brakes";
 import { getWheelFinishOption } from "@/config/wheels";
 import { useConfigurator } from "@/store/configurator";
+import { VehicleLightEffects } from "./VehicleLightEffects";
 
 const MODEL_URL = "/models/porsche-911-gt3-rs-992.glb";
 const HOOD_NODE_NAME = "TwiXeR_992_gt3rs_carbon_hood";
@@ -126,12 +127,23 @@ export function PorscheGT3RS() {
   const taillights = useConfigurator((state) => state.taillights);
   const hazards = useConfigurator((state) => state.hazards);
   const transitionNonce = useConfigurator((state) => state.transitionNonce);
+  const environmentId = useConfigurator((state) => state.environmentId);
+  const cameraPresetId = useConfigurator((state) => state.cameraPresetId);
 
   const paint = useMemo(() => getPaint(paintId), [paintId]);
   const wheel = useMemo(() => getWheelFinishOption(wheelId), [wheelId]);
   const caliper = useMemo(() => getCaliperOption(caliperId), [caliperId]);
   const transitionStart = useRef(0);
   const [hazardOn, setHazardOn] = useState(true);
+  const pointerGesture = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    startedAt: number;
+    threshold: number;
+    part: "hood" | "left-door" | "right-door";
+    moved: boolean;
+  } | null>(null);
 
   const { model, materialDefaults } = useMemo(() => {
     const clone = scene.clone(true);
@@ -454,9 +466,12 @@ export function PorscheGT3RS() {
         standard.emissive.set("#eef7ff");
         standard.emissiveIntensity = headlights
           ? materialName.includes("headlight_high")
-            ? 0.12
-            : 0.03
+            ? 4.8
+            : materialName.includes("led_lights")
+              ? 2.9
+              : 1.65
           : 0;
+        standard.toneMapped = headlights ? false : (defaults?.toneMapped ?? true);
       }
 
       const isFrontSignal =
@@ -468,10 +483,10 @@ export function PorscheGT3RS() {
       if (isFrontSignal) {
         standard.color.set(hazards && hazardOn ? "#ff8a00" : "#2b1a0e");
         standard.emissive.set("#ff6a00");
-        standard.emissiveIntensity = hazards && hazardOn ? 2.2 : 0;
+        standard.emissiveIntensity = hazards && hazardOn ? 4.1 : 0;
         standard.roughness = 0.22;
         standard.metalness = 0;
-        standard.toneMapped = true;
+        standard.toneMapped = !(hazards && hazardOn);
       }
 
       const isTailLight =
@@ -555,32 +570,79 @@ export function PorscheGT3RS() {
     }
   });
 
-  const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
-    if (objectHasNamedAncestor(event.object, HOOD_NODE_NAME)) {
-      event.stopPropagation();
-      toggleHoodOpen();
-      return;
-    }
+  const resolveInteractivePart = (object: THREE.Object3D | null) => {
+    if (objectHasNamedAncestor(object, HOOD_NODE_NAME)) return "hood" as const;
 
-    let current: THREE.Object3D | null = event.object;
+    let current = object;
     while (current) {
-      if (LEFT_DOOR_PART_NAMES.includes(current.name)) {
-        event.stopPropagation();
-        toggleLeftDoorOpen();
-        return;
-      }
-      if (RIGHT_DOOR_PART_NAMES.includes(current.name)) {
-        event.stopPropagation();
-        toggleRightDoorOpen();
-        return;
-      }
+      if (LEFT_DOOR_PART_NAMES.includes(current.name)) return "left-door" as const;
+      if (RIGHT_DOOR_PART_NAMES.includes(current.name)) return "right-door" as const;
       current = current.parent;
     }
+
+    return null;
+  };
+
+  const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
+    if (cameraPresetId === "cockpit") return;
+
+    const part = resolveInteractivePart(event.object);
+    if (!part) return;
+
+    const nativeEvent = event.nativeEvent;
+    pointerGesture.current = {
+      pointerId: nativeEvent.pointerId,
+      startX: nativeEvent.clientX,
+      startY: nativeEvent.clientY,
+      startedAt: performance.now(),
+      threshold: nativeEvent.pointerType === "touch" ? 12 : 7,
+      part,
+      moved: false,
+    };
+  };
+
+  const handlePointerMove = (event: ThreeEvent<PointerEvent>) => {
+    const gesture = pointerGesture.current;
+    const nativeEvent = event.nativeEvent;
+    if (!gesture || gesture.pointerId !== nativeEvent.pointerId) return;
+
+    const distance = Math.hypot(
+      nativeEvent.clientX - gesture.startX,
+      nativeEvent.clientY - gesture.startY,
+    );
+    if (distance > gesture.threshold) gesture.moved = true;
+  };
+
+  const handlePointerUp = (event: ThreeEvent<PointerEvent>) => {
+    const gesture = pointerGesture.current;
+    const nativeEvent = event.nativeEvent;
+    pointerGesture.current = null;
+
+    if (!gesture || gesture.pointerId !== nativeEvent.pointerId || gesture.moved) return;
+    if (performance.now() - gesture.startedAt > 650) return;
+    if (resolveInteractivePart(event.object) !== gesture.part) return;
+
+    event.stopPropagation();
+    if (gesture.part === "hood") toggleHoodOpen();
+    else if (gesture.part === "left-door") toggleLeftDoorOpen();
+    else toggleRightDoorOpen();
   };
 
   return (
     <group ref={group} scale={1.1} dispose={null}>
-      <primitive object={model} onPointerDown={handlePointerDown} />
+      <primitive
+        object={model}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+      />
+      <VehicleLightEffects
+        headlights={headlights}
+        indicatorsOn={hazards && hazardOn}
+        environmentId={environmentId}
+        leftMirrorVisible={!leftDoorOpen}
+        rightMirrorVisible={!rightDoorOpen}
+      />
     </group>
   );
 }

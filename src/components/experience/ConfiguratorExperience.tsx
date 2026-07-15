@@ -30,6 +30,7 @@ export function ConfiguratorExperience() {
   const language = useConfigurator((state) => state.language);
   const summaryMode = useConfigurator((state) => state.summaryMode);
   const transitionNonce = useConfigurator((state) => state.transitionNonce);
+  const cameraPresetId = useConfigurator((state) => state.cameraPresetId);
   const setPaintId = useConfigurator((state) => state.setPaintId);
   const setWheelId = useConfigurator((state) => state.setWheelId);
   const setCaliperId = useConfigurator((state) => state.setCaliperId);
@@ -135,6 +136,13 @@ export function ConfiguratorExperience() {
           <TopBar />
           <ConfiguratorPanel />
 
+          {!summaryMode && cameraPresetId === "cockpit" && (
+            <div className="cockpit-look-hint" role="status">
+              <span aria-hidden="true">↔</span>
+              {language === "pt" ? "Arraste para explorar o interior" : "Drag to explore the interior"}
+            </div>
+          )}
+
           {!summaryMode && (
             <>
               <aside className="scene-specs" aria-label="Vehicle specifications">
@@ -147,7 +155,13 @@ export function ConfiguratorExperience() {
               </aside>
 
               <div className="scene-notes">
-                <span>{t.drag}</span>
+                <span>
+                  {cameraPresetId === "cockpit"
+                    ? language === "pt"
+                      ? "Arraste para olhar ao redor"
+                      : "Drag to look around"
+                    : t.drag}
+                </span>
                 <small className="model-credit">
                   <a
                     href="https://sketchfab.com/3d-models/porsche-gt3-rs-e738eae819c34d19a31dd066c45e0f3d"

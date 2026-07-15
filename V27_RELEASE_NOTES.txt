@@ -1,0 +1,40 @@
+CHOOSE YOUR PORSCHE BY MARCOS — VERSION 27.0
+
+Interaction refinement
+- Doors and hood now respond on pointer release, not pointer down.
+- Drag distance and gesture duration are evaluated before an interactive panel opens.
+- Rotating the vehicle no longer triggers door or hood ghost touches.
+- Exterior panel interactions are disabled while the cockpit camera is active.
+
+Cockpit camera
+- Added limited first-person look-around.
+- Drag with mouse, touch, or trackpad to look left, right, up, and down.
+- Movement is damped and constrained to keep the camera inside the cabin.
+- Added an on-screen cockpit interaction hint.
+
+Adaptive screen support
+- Detects phone portrait, phone landscape, tablet portrait, compact landscape,
+  desktop, and ultrawide layouts.
+- Camera distance, target, field of view, scene offset, and platform scale adapt
+  to the detected viewport.
+- Added low-height and ultrawide UI refinements.
+- Caps mobile pixel ratio and disables heavy shadows on phone-sized displays.
+
+Lighting
+- Reuses the GLB's dedicated LED/high-beam emitter materials.
+- Increased headlight emissive output without recoloring unrelated materials.
+- Added two real spotlights, local point lights, and layered flare sprites.
+- The GT3 RS GLB does not expose separate mirror or rear-tip indicator meshes.
+  V27 therefore adds independent amber overlay layers for both mirror repeaters
+  and both rear indicator tips, avoiding whole-taillight flashing.
+
+Scope
+- GT3 RS remains the only vehicle in this release.
+- Multi-model 911 support is planned after V27 interaction and lighting review.
+
+Validation
+- All TypeScript/TSX files transpiled with zero diagnostics.
+- All local source imports resolved.
+- GLB structure inspected for named light, mirror, and rear-lamp nodes.
+- Full Next.js build could not be executed in the packaging environment because
+  the npm registry was unavailable during dependency installation.

@@ -1826,3 +1826,132 @@ html[data-environment="night"] .showroom-floor-glow {
   }
 }
 /* V25 END */
+
+/* V27 — interaction, adaptive viewport and lighting refinement */
+.experience-shell {
+  height: var(--app-height, 100svh);
+}
+
+.cockpit-look-hint {
+  position: absolute;
+  z-index: 18;
+  left: 50%;
+  top: 96px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  border-radius: 999px;
+  color: rgba(18, 22, 27, 0.78);
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 10px 30px rgba(33, 42, 52, 0.08);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+  animation: v27HintIn 0.45s ease both;
+}
+
+.cockpit-look-hint span {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+@keyframes v27HintIn {
+  from { opacity: 0; transform: translate(-50%, -8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+html[data-screen="phone-portrait"] .top-bar,
+html[data-screen="tablet-portrait"] .top-bar {
+  min-height: 64px;
+  padding-top: max(12px, env(safe-area-inset-top));
+  padding-bottom: 10px;
+}
+
+html[data-screen="phone-portrait"] .configurator-panel {
+  max-height: min(58svh, 520px) !important;
+}
+
+html[data-screen="tablet-portrait"] .configurator-panel {
+  max-height: min(54svh, 600px) !important;
+}
+
+html[data-screen="phone-portrait"] .cockpit-look-hint,
+html[data-screen="tablet-portrait"] .cockpit-look-hint {
+  top: max(74px, calc(env(safe-area-inset-top) + 62px));
+  max-width: calc(100vw - 28px);
+  padding: 8px 12px;
+  font-size: 0.56rem;
+  white-space: nowrap;
+}
+
+html[data-screen="phone-landscape"] .top-bar,
+html[data-screen="compact-landscape"] .top-bar {
+  min-height: 62px;
+  padding-block: 10px;
+}
+
+html[data-screen="phone-landscape"] .configurator-panel {
+  top: 72px !important;
+  right: 10px !important;
+  bottom: 10px !important;
+  width: min(46vw, 370px) !important;
+}
+
+html[data-screen="phone-landscape"] .step-content {
+  padding: 14px 12px !important;
+}
+
+html[data-screen="phone-landscape"] .scene-specs,
+html[data-screen="phone-landscape"] .scene-notes,
+html[data-screen="phone-landscape"] .project-disclaimer {
+  display: none !important;
+}
+
+html[data-screen="phone-landscape"] .cockpit-look-hint,
+html[data-screen="compact-landscape"] .cockpit-look-hint {
+  top: 72px;
+  left: 30%;
+}
+
+html[data-aspect="ultrawide"] .configurator-panel {
+  right: clamp(28px, 3.2vw, 62px) !important;
+  width: min(440px, 27vw) !important;
+}
+
+html[data-aspect="ultrawide"] .scene-specs {
+  left: clamp(32px, 4vw, 74px);
+}
+
+@media (max-height: 680px) and (orientation: landscape) {
+  .configurator-panel {
+    top: 76px !important;
+    bottom: 10px !important;
+  }
+
+  .step-content {
+    padding-block: 14px !important;
+  }
+
+  .detail-options,
+  .lighting-options {
+    gap: 16px;
+  }
+
+  .selection-preview {
+    height: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cockpit-look-hint {
+    animation: none;
+  }
+}
+/* V27 END */
